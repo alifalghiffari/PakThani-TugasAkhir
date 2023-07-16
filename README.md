@@ -22,6 +22,6 @@
 - `Admin can upload and manage product images`
 - `Admin can organize products into collections or featured categories`
 - `Admin can view and manage customer orders`
-- `Admin can update order status (processing, shipped, delivered)`
+- `Admin can update order status (processing, shipped, delivered)` //
 - `Admin can view and manage customer accounts`
 - `Admin can update inventory availability and pricing`
