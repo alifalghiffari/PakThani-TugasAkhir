@@ -5,9 +5,10 @@
 
 - `Users can register an account`
 - `Users can login to the page`
+- `Users can logout from website`
 - `Users can view category items`
 - `Users can view detail items`
-- `Users can add items to cart`
+- `Users can add, update, remove items to cart`
 - `Users can view items in cart`
 - `Users can checkout items`
 - `Users can add address when checkout`
