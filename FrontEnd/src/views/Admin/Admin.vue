@@ -22,6 +22,7 @@ export default {
 }
 </script>
 
+
 <style>
 .adminPanel{
   display : flex;

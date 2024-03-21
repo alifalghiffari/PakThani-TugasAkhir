@@ -9,7 +9,7 @@
       </div>
     </div>
     <div class="row">
-      <div v-for="category of categories" :key="category.id" class="col-md-6 col-xl-4 col-12 pt-3  justify-content-around d-flex">
+      <div v-for="category of category" :key="category.id" class="col-md-6 col-xl-4 col-12 pt-3  justify-content-around d-flex">
         <CategoryBox :category="category">
         </CategoryBox>
       </div>
@@ -22,7 +22,7 @@ import CategoryBox from '../../components/Category/CategoryBox';
 export default {
   name: 'Category',
   components : {CategoryBox},
-  props : [ "baseURL" , "categories" ],
+  props : [ "baseURL" , "category" ],
   mounted(){
     if (this.$route.name=='AdminCategory' && !localStorage.getItem('token')) {
       this.$router.push({name : 'Signin'});

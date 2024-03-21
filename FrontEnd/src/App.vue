@@ -6,10 +6,10 @@
   />
   <div style="min-height: 60vh">
     <router-view
-      v-if="products && categories"
+      v-if="products && category"
       :baseURL="baseURL"
       :products="products"
-      :categories="categories"
+      :category="category"
       @fetchData="fetchData"
     >
     </router-view>
@@ -23,10 +23,10 @@ import Footer from './components/Footer.vue';
 export default {
   data() {
     return {
-      baseURL: 'https://limitless-lake-55070.herokuapp.com/',
-      //baseURL: "http://localhost:8080/",
+      // baseURL: 'https://limitless-lake-55070.herokuapp.com/',
+     baseURL: "http://localhost:3000/",
       products: null,
-      categories: null,
+      category: null,
       key: 0,
       token: null,
       cartCount: 0,
@@ -38,14 +38,14 @@ export default {
     async fetchData() {
       // fetch products
       await axios
-        .get(this.baseURL + 'product/')
-        .then((res) => (this.products = res.data))
+        .get(this.baseURL + '/api/products')  
+        .then((res) => (this.products = res.data.data))
         .catch((err) => console.log(err));
 
       //fetch categories
       await axios
-        .get(this.baseURL + 'category/')
-        .then((res) => (this.categories = res.data))
+        .get(this.baseURL + '/api/categories')
+        .then((res) => (this.category = res.data.data))
         .catch((err) => console.log(err));
 
       //fetch cart items

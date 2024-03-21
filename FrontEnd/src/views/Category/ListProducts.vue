@@ -3,44 +3,60 @@
     <div class="row">
       <div class="col-12 text-center">
         <h4 class="pt-3">{{category.categoryName}}</h4>
-        <h5>{{msg}}</h5>
+        <h5></h5>
       </div>
     </div>
 
     <div class="row">
-      <img v-show="len == 0" class="img-fluid" src="../../assets/sorry.jpg" alt="Sorry">
-      <div v-for="product of category.products" :key="product.id" class="col-md-6 col-xl-4 col-12 pt-3  justify-content-around d-flex">
+      <!-- <img v-show="len == 0" class="img-fluid" src="../../assets/sorry.jpg" alt="Sorry"> -->
+      <div v-for="product in produk" :key="product.id" class="col-md-6 col-xl-4 col-12 pt-3  justify-content-around d-flex">
         <ProductBox :product="product">
-        </ProductBox>
+        </ProductBox> 
       </div>
+      <p></p>
     </div>
   </div>
 </template>
 
 <script>
 import ProductBox from '../../components/Product/ProductBox';
+
 export default {
   name: 'ListProducts',
-  data(){
+  data() {
     return {
-      id : null,
-      categoryIndex : null,
-      category : {},
-      len : 0,
-      msg : null
+      id: null,
+      categories: [], // Mengubah inisialisasi categories menjadi array kosong
+      len: 0,
+      produk : [],
+      msg: null
     }
   },
-  components : {ProductBox},
-  props : [ "baseURL" , "categories" ],
+  components: { ProductBox },
+  props: ["baseURL", "category", "products"],
   mounted() {
     this.id = this.$route.params.id;
-    this.categoryIndex = this.categories.findIndex(category => category.id == this.id);
-    this.category = this.categories[this.categoryIndex];
+    console.log(this.id);
+    // Filter kategori yang sesuai dengan ID
+    this.categories = this.category.filter((category) => category.id == this.id);
+    this.produk = this.products.filter((product) => product.categoryId == this.id);
+    console.log(this.produk);
 
-    this.len = this.category.products.length;
-    if(this.len == 0) {
-      this.msg = "Sorry, no products found";
-    } else if(this.len == 1) {
+
+
+    if (this.categories.length === 0) {
+      this.msg = "Sorry, no categories found for this ID";
+      return;
+    }
+
+    // Menghitung total produk dari seluruh kategori yang sesuai dengan ID
+    this.len = this.categories.reduce((acc, category) => {
+      return acc + (category.products ? category.products.length : 0);
+    }, 0);
+    
+    if (this.len === 0) {
+      this.msg = "Sorry, no products found for these categories";
+    } else if (this.len === 1) {
       this.msg = "Only 1 product found";
     } else {
       this.msg = this.len + " products found";
@@ -48,6 +64,8 @@ export default {
   }
 }
 </script>
+
+
 
 <style scoped>
 h4 {

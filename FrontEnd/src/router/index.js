@@ -28,6 +28,8 @@ import Failed from '../helper/payment/Failed.vue'
 
 import OrderDetails from "../views/Orders/OrderDetails";
 
+
+
 const routes = [
   {
     path: '/',
@@ -161,10 +163,36 @@ const router = createRouter({
   routes
 })
 
-//scroll to top after every route change
 router.beforeEach((to, from, next) => {
-  window.scrollTo(0, 0);
-  next();
+  const requiresAuth = ['Cart', 'Admin', 'AddProduct', 'EditProduct', 'AddCategory', 'EditCategory', 'AddImage'];
+  const authRequired = requiresAuth.includes(to.name);
+
+  const isLoggedIn = localStorage.getItem('token');
+  const user = localStorage.getItem('user');
+
+  if (authRequired) {
+    if (!isLoggedIn) {
+      // Redirect ke halaman login jika tidak ada token
+      next('/signin');
+    } else {
+      // Periksa peran pengguna di sini
+      if (user === "admin") {
+        //how to create this user can access all page
+        next();
+      } else {
+        //how to create this user can access all page except admin page
+        if (to.name === 'Admin' || to.name === 'AddProduct' || to.name === 'EditProduct' || to.name === 'AddCategory' || to.name === 'EditCategory' || to.name === 'AddImage') {
+          next('/');
+        } else {
+          next();
+        }
+      }
+    }
+  } else {
+    // Halaman yang tidak memerlukan otorisasi khusus
+    next();
+  }
 });
+
 
 export default router

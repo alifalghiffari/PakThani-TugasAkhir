@@ -8,17 +8,17 @@
     <!--    loop over all the cart items and display one by one-->
     <div
       v-for="cartItem in cartItems"
-      :key="cartItem.product.id"
+      :key="cartItem.id"
       class="row mt-2 pt-3 justify-content-around"
     >
       <div class="col-2"></div>
       <!-- display image -->
       <div class="col-md-3 embed-responsive embed-responsive-16by9">
         <router-link
-          :to="{ name: 'ShowDetails', params: { id: cartItem.product.id } }"
+          :to="{ name: 'ShowDetails', params: { id: cartItem.product[0].id } }"
         >
           <img
-            v-bind:src="cartItem.product.imageURL"
+            v-bind:src="cartItem.product[0].imageURL"
             class="w-100 card-img-top embed-responsive-item"
           />
         </router-link>
@@ -28,12 +28,12 @@
         <div class="card-block px-3">
           <h6 class="card-title">
             <router-link
-              :to="{ name: 'ShowDetails', params: { id: cartItem.product.id } }"
-              >{{ cartItem.product.name }}
+              :to="{ name: 'ShowDetails', params: { id: cartItem.product[0].id } }"
+              >{{ cartItem.product[0].name }}
             </router-link>
           </h6>
           <p id="item-price" class="mb-0 font-weight-bold">
-            $ {{ cartItem.product.price }} per unit
+            $ {{ cartItem.product[0].price }} per unit
           </p>
           <p id="item-quantity" class="mb-0">
             Quantity :
@@ -46,7 +46,7 @@
           <p id="item-total-price" class="mb-0">
             Total Price:
             <span class="font-weight-bold">
-              $ {{ cartItem.product.price * cartItem.quantity }}</span
+              $ {{ cartItem.product[0].price * cartItem.quantity }}</span
             >
           </p>
           <br /><a href="#" class="text-right" @click="deleteItem(cartItem.id)"
@@ -60,9 +60,9 @@
 
     <!-- display total price -->
     <div class="total-cost pt-2 text-right">
-      <h5>Total : $ {{ totalcost.toFixed(2) }}</h5>
+      <h5>Total : $ {{ totalcost }}</h5>
       <button
-        :disabled="isDisabled()"
+        
         type="button"
         class="btn btn-primary confirm"
         @click="checkout"
@@ -79,38 +79,60 @@ export default {
   data() {
     return {
       cartItems: [],
-      token: null,
+      token: localStorage.getItem('token'),
       totalcost: 0,
     };
   },
   name: 'Cart',
   props: ['baseURL'],
   methods: {
-    isDisabled() {
-      if (this.cartItems.length === 0) {
-        return true;
-      }
-      return false;
-    },
+    // isDisabled() {
+    //   if (this.cartItems.length === 0) {
+    //     return true;
+    //   }
+    //   return false;
+    // },
     // fetch all the items in cart
     listCartItems() {
-      axios.get(`${this.baseURL}cart/?token=${this.token}`).then(
-        (response) => {
-          if (response.status == 200) {
-            const result = response.data;
-            // store cartitems and total price in two variables
-            this.cartItems = result.cartItems;
-            this.totalcost = result.totalCost;
-          }
+      axios.get(`${this.baseURL}api/carts/users`, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
         },
-        (error) => {
+      }).then(response => {
+          if (response.data.code === 200) {
+            const result = response.data.data;
+            // store cartitems and total price in two variables
+            this.cartItems = result;
+            this.totalcost = result.total_price;
+          }
+        })
+        .catch((error) => {
           console.log(error);
-        }
-      );
+        });
     },
     // go to checkout page
     checkout() {
-      this.$router.push({ name: 'Checkout' });
+      // this.$router.push({ name: 'Checkout' });
+      axios.post(`${this.baseURL}api/orders`, {
+          cart: this.cartItems.id,
+        }, {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        })
+        .then((response) => {
+          if (response.data.code === 200) {
+            this.$router.push({
+              name: 'Checkout',
+              params: {
+                orderId: response.data.data.id,
+              },
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     deleteItem(itemId) {
       axios

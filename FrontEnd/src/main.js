@@ -9,3 +9,4 @@ import swal from 'sweetalert';
 window.axios = require('axios')
 
 createApp(App).use(router).mount('#app');
+

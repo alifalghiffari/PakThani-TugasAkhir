@@ -3,18 +3,15 @@
     <div class="embed-responsive embed-responsive-16by9">
       <img
         class="card-img-top embed-responsive-item"
-        :src="category.imageUrl"
+        :src="category.icon"
         alt="Category Image"
       />
     </div>
 
     <div class="card-body">
       <router-link :to="{ name: 'ListProducts', params: { id: category.id } }"
-        ><h5 class="card-title">{{ category.categoryName }}</h5></router-link
+        ><h5 class="card-title">{{ category.category }}</h5></router-link
       >
-      <p class="card-text font-italic">
-        {{ category.description.substring(0, 65) }}...
-      </p>
       <router-link
         id="edit-category"
         :to="{ name: 'EditCategory', params: { id: category.id } }"

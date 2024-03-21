@@ -4,7 +4,7 @@
     <div class="row">
       <div class="col-12 text-center pt-3">
         <router-link :to="{ name: 'Home' }">
-          <img id="logo" src="../assets/icon.png" />
+          <img id="logo" src="../assets/logo.png" />
         </router-link>
       </div>
     </div>
@@ -15,11 +15,11 @@
           <h2 class="pt-4 pl-4">Sign-In</h2>
           <form @submit="signin" class="pt-4 pl-4 pr-4">
             <div class="form-group">
-              <label>Email</label>
+              <label>Username</label>
               <input
-                type="email"
+                type="text"
                 class="form-control"
-                v-model="email"
+                v-model="username"
                 required
               />
             </div>
@@ -33,7 +33,7 @@
               />
             </div>
             <small class="form-text text-muted"
-              >By continuing, you agree to Simplecoding's Conditions of Use and
+              >By continuing, you agree to PakThani Conditions of Use and
               Privacy Notice.</small
             >
             <button type="submit" class="btn btn-primary mt-2 py-0">
@@ -49,13 +49,13 @@
           </form>
           <hr />
           <small class="form-text text-muted pt-2 pl-4 text-center"
-            >New to Simplecoding?</small
+            >Yuk daftar PakThani</small
           >
           <p class="text-center">
             <router-link
               :to="{ name: 'Signup' }"
               class="btn btn-dark text-center mx-auto px-5 py-1 mb-2"
-              >Create Your Simplecoding Account</router-link
+              >Create Account</router-link
             >
           </p>
         </div>
@@ -70,7 +70,7 @@ export default {
   props: ["baseURL"],
   data() {
     return {
-      email: null,
+      username: null,
       password: null,
       loading: null,
     };
@@ -81,17 +81,20 @@ export default {
       this.loading = true;
 
       const user = {
-        email: this.email,
+        username: this.username,
         password: this.password,
       };
 
       await axios
-        .post(`${this.baseURL}user/signIn`, user)
+        .post(`http://localhost:3000/api/users/login`, user)
         .then((res) => {
-          localStorage.setItem("token", res.data.token);
-          this.$emit("fetchData");
-          this.$router.push({ name: "Home" });
-        })
+          if(res.data.code === 200) {
+            localStorage.setItem("token", res.data.data.token);
+            localStorage.setItem("user", res.data.data.role);
+            this.$emit("fetchData");
+            this.$router.push({ name: "Home" });
+          }
+        }) 
         .catch((err) => {
           swal({
             text: "Unable to Log you in!",

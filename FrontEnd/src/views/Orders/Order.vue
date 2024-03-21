@@ -6,7 +6,7 @@
       </div>
     </div>
     <!--        for each order display -->
-    <div v-for="order in orderList" :key="order.pid" class="row mt-2 pt-3 justify-content-around">
+    <div v-for="order in orderList" :key="order.id" class="row mt-2 pt-3 justify-content-around">
       <div class="col-2"></div>
       <div class="col-md-3 embed-responsive embed-responsive-16by9">
         <!--                display image in left-->
@@ -20,6 +20,7 @@
           <p class="mb-0">{{order.totalItems}} item<span v-if="order.totalItems > 1">s</span></p>
           <p id="item-price" class="mb-0 font-weight-bold">Total Cost : $ {{order.totalCost}}</p>
           <p id="item-total-price">Ordered on : {{order.orderdate}}</p>
+          <p id="item-status">Status : {{ order.orderStatus }}</p>
         </div>
       </div>
       <div class="col-2"></div>
@@ -44,21 +45,26 @@
     methods: {
       // list of order histories
       listOrders(){
-        axios.get(`${this.baseURL}order/?token=${this.token}`)
+        axios.get(`${this.baseURL}api/orders/users`, {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        })
           .then((response) => {
               if(response.status==200){
-                this.orders = response.data
+                this.orders = response.data.data;
                 // for each order populate orderList
                 this.orders.forEach((order) => {
                   this.orderList.push({
                     id: order.id,
                     totalCost: order.totalPrice,
+                    orderStatus: order.order_status,
                     // get short date
-                    orderdate: order.createdDate.substring(0,10),
+                    //orderdate: order.createdDate.substring(0,10),
                     // get image of the first orderItem of the order
-                    imageURL: order.orderItems[0].product.imageURL,
+                    //imageURL: order.orderItems[0].product.imageURL,
                     // get total items
-                    totalItems: order.orderItems.length
+                    //totalItems: order.orderItems.length
                   })
                 })
               }

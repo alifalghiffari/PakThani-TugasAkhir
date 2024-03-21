@@ -4,7 +4,7 @@
     <div class="row">
       <div class="col-12 text-center pt-3">
         <router-link :to="{ name: 'Home' }">
-          <img id="logo" src="../assets/icon.png" />
+          <img id="logo" src="../assets/logo.png" />
         </router-link>
       </div>
     </div>
@@ -18,6 +18,8 @@
               <label>Email</label>
               <input
                 type="email"
+                name="email"
+                id="email"
                 class="form-control"
                 v-model="email"
                 required
@@ -26,9 +28,11 @@
             <div class="form-row">
               <div class="col">
                 <div class="form-group">
-                  <label>First Name</label>
+                  <label>Name</label>
                   <input
                     type="name"
+                    name="name"
+                    id="name"
                     class="form-control"
                     v-model="firstName"
                     required
@@ -37,20 +41,33 @@
               </div>
               <div class="col">
                 <div class="form-group">
-                  <label>Last Name</label>
+                  <label>Username</label>
                   <input
                     type="name"
+                    name="username"
+                    id="usernamJe"
                     class="form-control"
-                    v-model="lastName"
+                    v-model="username"
                     required
                   />
                 </div>
               </div>
             </div>
+            <!-- <div class="form-group">
+              <label>No HP</label>
+              <input
+                type="number"
+                class="form-control"
+                v-model="nohp"
+                required
+              />
+            </div> -->
             <div class="form-group">
               <label>Password</label>
               <input
                 type="password"
+                name="password"
+                id="password"
                 class="form-control"
                 v-model="password"
                 required
@@ -65,19 +82,30 @@
                 required
               />
             </div>
+            <div class="form-group">
+              <input 
+              type="text"
+              name="role"
+              id="role"
+              value="user"
+              class="form-control"
+              
+              hidden
+              />
+            </div>
             <button type="submit" class="btn btn-primary mt-2 py-0">
               Create Account
             </button>
           </form>
           <hr />
           <small class="form-text text-muted pt-2 pl-4 text-center"
-            >Already Have an Account?</small
+            >Sudah Punya Akun?</small
           >
           <p class="text-center">
             <router-link
-              class="btn btn-dark text-center mx-auto px-5 py-1 mb-2"
+              class="btn btn-dark text-center mx-auto px-5 py-1 mb-2" type="submit"
               :to="{ name: 'Signin' }"
-              >Signin Here</router-link
+              >Log In Disini</router-link
             >
           </p>
         </div>
@@ -93,10 +121,11 @@ export default {
   data() {
     return {
       email: null,
-      firstName: null,
-      lastName: null,
+      //name: null,
+      username: null,
       password: null,
       passwordConfirm: null,
+      role: "user",
     };
   },
   methods: {
@@ -107,15 +136,18 @@ export default {
         // make the post body
         const user = {
           email: this.email,
-          firstName: this.firstName,
-          lastName: this.lastName,
+          //name: this.name,
+          username: this.username,
           password: this.password,
+          role: this.role,
         };
+        console.log(user);
 
         // call the API
         await axios
-          .post(`${this.baseURL}user/signup`, user)
-          .then(() => {
+          .post(`http://localhost:3000/api/users/register`, user)
+          .then((res) => {
+            console.log(res);
             // redirect to home page
             this.$router.replace("/");
             swal({

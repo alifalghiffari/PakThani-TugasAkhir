@@ -3,12 +3,12 @@
     <div class="row pt-5">
       <div class="col-md-1"></div>
       <div class="col-md-4 col-12">
-        <img :src="product.imageURL" :alt="product.name" class="img-fluid" />
+        <img :src="product.image" :alt="product.name" class="img-fluid" />
       </div>
       <div class="col-md-6 col-12 pt-3 pt-md-0">
         <h4>{{ product.name }}</h4>
-        <h6 class="category font-italic">{{ category.categoryName }}</h6>
-        <h6 class="font-weight-bold">$ {{ product.price }}</h6>
+        <h6 class="category font-italic">{{ category.category }}</h6>
+        <h6 class="font-weight-bold">Rp. {{ product.price }}</h6>
         <p>
           {{ product.description }}
         </p>
@@ -74,15 +74,15 @@ export default {
   data() {
     return {
       product: {},
-      category: {},
+      category: [],
       id: null,
-      token: null,
+      token: localStorage.getItem('token'),
       isAddedToWishlist: false,
       wishlistString: "Add to wishlist",
       quantity: 1,
     };
   },
-  props: ["baseURL", "products", "categories"],
+  props: ["baseURL", "products", "category"],
   methods: {
     addToWishList(productId) {
       axios
@@ -102,6 +102,9 @@ export default {
         );
     },
     addToCart(productId) {
+
+      productId = parseInt(productId, 10);
+
       if (!this.token) {
         swal({
           text: "Please log in first!",
@@ -110,13 +113,16 @@ export default {
         return;
       }
       axios
-        .post(`${this.baseURL}cart/add?token=${this.token}`, {
-          productId: productId,
+        .post(`${this.baseURL}api/carts`, {
+          product_id: productId,
           quantity: this.quantity,
+        }, {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
         })
-        .then(
-          (response) => {
-            if (response.status == 201) {
+        .then((response) => {
+            if (response.data.code === 200) {
               swal({
                 text: "Product Added to the cart!",
                 icon: "success",
@@ -125,11 +131,10 @@ export default {
               // refresh nav bar
               this.$emit("fetchData");
             }
-          },
-          (error) => {
+          })
+          .catch((error) => {
             console.log(error);
-          }
-        );
+          });
     },
 
     listCartItems() {
@@ -148,7 +153,7 @@ export default {
   mounted() {
     this.id = this.$route.params.id;
     this.product = this.products.find((product) => product.id == this.id);
-    this.category = this.categories.find(
+    this.category = this.category.find(
       (category) => category.id == this.product.categoryId
     );
     this.token = localStorage.getItem("token");

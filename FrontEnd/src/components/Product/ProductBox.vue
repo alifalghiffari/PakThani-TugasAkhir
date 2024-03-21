@@ -3,7 +3,7 @@
     <div class="embed-responsive embed-responsive-16by9">
       <img
         class="card-img-top embed-responsive-item"
-        :src="product.imageURL"
+        :src="product.image"
         alt="Product Image"
       />
     </div>
@@ -11,7 +11,7 @@
       <router-link :to="{ name: 'ShowDetails', params: { id: product.id } }"
         ><h5 class="card-title">{{ product.name }}</h5></router-link
       >
-      <p class="card-text"><sup>$</sup>{{ product.price }}</p>
+      <p class="card-text"><sup>Rp</sup>{{ product.price }}</p>
       <p class="card-text font-italic">
         {{ product.description.substring(0, 65) }}...
       </p>

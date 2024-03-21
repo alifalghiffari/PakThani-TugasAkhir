@@ -20,16 +20,12 @@
 <script>
 import ProductBox from '../../components/Product/ProductBox';
 export default {
-  name: 'Product',
-  components : {ProductBox},
-  props : [ "baseURL" , "products" ],
-  mounted(){
-    if (this.$route.name=='AdminProduct' && !localStorage.getItem('token')) {
-      this.$router.push({name : 'Signin'});
-    }
-  }
+  name: 'YourComponentName',
+  components: { ProductBox },
+  props: ["baseURL", "products"],
 }
 </script>
+
 
 <style scoped>
 h4 {

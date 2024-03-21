@@ -6,8 +6,7 @@
       <div class="container py-5">
         <header class="text-left text-white py-5">
           <h3 class="mb-4 rounded"><a href="#start-shopping" class="bg-white px-2 py-2 rounded" id="heading">Start Shopping</a></h3>
-          <p id="content" class="lead mb-0 bg-dark p-1 rounded">Simple Coding Market is for educational purposes only.
-            It can be used by developers to learn about developing an ecommerce application complete with backend and frontend for Web and Android</p>
+          <p id="content" class="lead mb-0 bg-dark p-1 rounded">Start Shopping with Us</p>
         </header>
       </div>
     </div>
@@ -19,8 +18,8 @@
         </div>
       </div>
       <div class="row">
-        <div v-for="index in this.category_size" :key="index" class="col-md-6 col-xl-4 col-12 pt-3  justify-content-around d-flex">
-          <CategoryBox :category="categories[index-1]">
+        <div v-for="index in this.category_size" :key="index" class="col-md-6 col-xl col-12 pt-3  justify-content-around d-flex">
+          <CategoryBox :category="category[index-1]">
           </CategoryBox>
         </div>
       </div>
@@ -44,12 +43,13 @@
 </template>
 
 <script>
+
   import ProductBox from "../components/Product/ProductBox";
   import CategoryBox from "../components/Category/CategoryBox";
   export default {
     name: 'Home',
     components : { ProductBox, CategoryBox},
-    props : ["baseURL", "products", "categories"],
+    props : ["baseURL", "products", "category"],
     data(){
       return{
         category_size:0,
@@ -57,7 +57,7 @@
       }
     },
     mounted(){
-      this.category_size = this.categories.length;
+      this.category_size = this.category.length;
       this.category_size = Math.min(6, this.category_size);
 
       this.product_size = this.products.length;
@@ -68,7 +68,7 @@
 
 <style>
   .page-holder {
-    min-height: 100vh;
+    min-height: 80vh;
   }
 
   .bg-cover {
@@ -76,7 +76,7 @@
   }
 
   #background-div {
-    background: url(../assets/home.png)
+    background: url(../assets/homeview.jpg)
   }
 
   #heading {
