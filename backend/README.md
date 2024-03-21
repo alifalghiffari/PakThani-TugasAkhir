@@ -1,6 +1,4 @@
-# thesis project
-
-## Requirements for Apis
+## Requirements Apis
 # Users
 
 - `Users can register an account`
