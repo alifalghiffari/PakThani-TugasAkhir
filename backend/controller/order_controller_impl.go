@@ -20,6 +20,17 @@ func NewOrderController(orderService service.OrderService) OrderController {
 	}
 }
 
+func (controller *OrderControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	orderResponse := controller.OrderService.FindAll(request.Context())
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   orderResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
 func (controller *OrderControllerImpl) FindOrderByUserId(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	userId := request.Context().Value("userId").(int)
 

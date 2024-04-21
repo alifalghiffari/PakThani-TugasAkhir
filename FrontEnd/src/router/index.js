@@ -14,6 +14,7 @@ import ShowDetails from '../views/Product/ShowDetails.vue'
 import Wishlist from '../views/Product/Wishlist.vue'
 import Cart from '../views/Cart/Cart.vue'
 import Checkout from '../views/Checkout/Checkout.vue'
+import Address from '../views/Checkout/Address.vue'
 import Order from '../views/Orders/Order.vue'
 
 import Category from '../views/Category/Category.vue'
@@ -135,6 +136,11 @@ const routes = [
     path : '/checkout',
     name : 'Checkout',
     component : Checkout
+  },
+  {
+    path : '/address',
+    name : 'Address',
+    component : Address
   },
   {
     path : '/order',

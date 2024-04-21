@@ -89,7 +89,7 @@
             Accounts
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <router-link
+            <!-- <router-link
               class="dropdown-item"
               v-if="!token"
               :to="{ name: 'Signin' }"
@@ -97,8 +97,8 @@
             >
             <router-link class="dropdown-item" v-else :to="{ name: 'Wishlist' }"
               >Wishlist</router-link
-            >
-            <router-link class="dropdown-item" :to="{ name: 'Admin' }"
+            > -->
+            <router-link class="dropdown-item" v-if="token && isAdmin" :to="{ name: 'Admin' }"
               >Admin</router-link
             >
             <router-link
@@ -119,14 +119,14 @@
           </div>
         </li>
 
-        <li class="nav-item">
+        <!-- <li class="nav-item">
           <router-link class="nav-link text-light" :to="{ name: 'Order' }"
             >Orders</router-link
           >
-        </li>
+        </li> -->
         <li class="nav-item">
           <div id="cart">
-            <span id="nav-cart-count">{{ cartCount }}</span>
+            <!-- <span id="nav-cart-count">{{ cartCount }}</span> -->
             <router-link class="text-light" :to="{ name: 'Cart' }"
               ><i class="fa fa-shopping-cart" style="font-size:36px"></i
             ></router-link>
@@ -158,6 +158,12 @@ export default {
         closeOnClickOutside: false,
       });
     },
+  },
+  computed: {
+    isAdmin() {
+      const role = localStorage.getItem('user');
+      return role === 'admin';
+    }
   },
   mounted() {
     this.token = localStorage.getItem("token");

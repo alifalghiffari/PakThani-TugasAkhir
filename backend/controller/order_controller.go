@@ -11,4 +11,5 @@ type OrderController interface {
 	FindOrderById(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	CreateOrder(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 	UpdateOrder(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
+	FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params)
 }

@@ -49,19 +49,19 @@ export default {
         .catch((err) => console.log(err));
 
       //fetch cart items
-      if (this.token) {
-        await axios.get(`${this.baseURL}cart/?token=${this.token}`).then(
-          (response) => {
-            if (response.status == 200) {
-              // update cart
-              this.cartCount = Object.keys(response.data.cartItems).length;
-            }
-          },
-          (error) => {
-            console.log(error);
-          }
-        );
-      }
+      // if (this.token) {
+      //   await axios.get(`${this.baseURL}cart/?token=${this.token}`).then(
+      //     (response) => {
+      //       if (response.status == 200) {
+      //         // update cart
+      //         this.cartCount = Object.keys(response.data.cartItems).length;
+      //       }
+      //     },
+      //     (error) => {
+      //       console.log(error);
+      //     }
+      //   );
+      // }
     },
     resetCartCount() {
       this.cartCount = 0;

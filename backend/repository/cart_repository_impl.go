@@ -68,7 +68,7 @@ func (repository *CartRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, 
 
 func (repository *CartRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.Tx, userId int) ([]domain.Cart, error) {
 	SQL := `
-		SELECT c.id, c.userId, c.product_id, c.quantity, p.name, p.price
+		SELECT c.id, c.userId, c.product_id, c.quantity, p.name, p.price, p.image
 		FROM cart c
 		LEFT JOIN product p ON c.product_id = p.id
 		WHERE c.userId = ?
@@ -83,7 +83,7 @@ func (repository *CartRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.
 	for rows.Next() {
 		cart := domain.Cart{}
 		product := domain.Product{}
-		if err := rows.Scan(&cart.Id, &cart.UserId, &product.Id, &cart.Quantity, &product.Name, &product.Price); err != nil {
+		if err := rows.Scan(&cart.Id, &cart.UserId, &product.Id, &cart.Quantity, &product.Name, &product.Price, &product.Image); err != nil {
 			return nil, err
 		}
 		cart.Product = append(cart.Product, product)

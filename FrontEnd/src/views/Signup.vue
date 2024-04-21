@@ -45,7 +45,7 @@
                   <input
                     type="name"
                     name="username"
-                    id="usernamJe"
+                    id="username"
                     class="form-control"
                     v-model="username"
                     required
@@ -87,7 +87,7 @@
               type="text"
               name="role"
               id="role"
-              value="user"
+              value=""
               class="form-control"
               
               hidden
@@ -125,7 +125,7 @@ export default {
       username: null,
       password: null,
       passwordConfirm: null,
-      role: "user",
+      role: true,
     };
   },
   methods: {

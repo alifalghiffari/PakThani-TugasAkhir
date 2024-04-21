@@ -12,6 +12,7 @@ type Order struct {
 	// GrandTotal    float64       // Total keseluruhan pesanan setelah ditambah biaya pengiriman
 	OrderStatus   OrderStatus   // Status pesanan (misalnya: pending, diproses, selesai, dll.)
 	PaymentStatus PaymentStatus // Status pembayaran pesanan (misalnya: pending, berhasil, gagal, dll.)
+	User          []User
 }
 
 // OrderStatus mendefinisikan status pesanan

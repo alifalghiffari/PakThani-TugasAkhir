@@ -11,4 +11,5 @@ type OrderRepository interface {
 	FindByUserId(ctx context.Context, tx *sql.Tx, userId int) ([]domain.Order, error)
 	Insert(ctx context.Context, tx *sql.Tx, order domain.Order) domain.Order
 	Update(ctx context.Context, tx *sql.Tx, order domain.Order) domain.Order
+	FindAll(ctx context.Context, tx *sql.Tx) []domain.Order
 }

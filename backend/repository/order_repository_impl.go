@@ -14,6 +14,29 @@ func NewOrderRepositoryImpl() OrderRepository {
 	return &OrderRepositoryImpl{}
 }
 
+func (repository *OrderRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Order {
+	SQL := `
+        SELECT o.id, o.user_id, o.total_items, o.total_price, o.order_status, o.payment_status, u.id, u.username
+        FROM orders o
+        INNER JOIN user u ON o.user_id = u.id
+    `
+	rows, err := tx.QueryContext(ctx, SQL)
+	helper.PanicIfError(err)
+	defer rows.Close()
+
+	var orders []domain.Order
+	for rows.Next() {
+		order := domain.Order{}
+		user := domain.User{}
+		err := rows.Scan(&order.ID, &order.UserID, &order.TotalItems, &order.TotalPrice, &order.OrderStatus, &order.PaymentStatus, &user.Id, &user.Username)
+		helper.PanicIfError(err)
+		order.User = append(order.User, user)
+		orders = append(orders, order)
+	}
+
+	return orders
+}
+
 func (repository *OrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, orderId int) (domain.Order, error) {
 	query := "SELECT id, user_id, total_items, total_price, order_status, payment_status FROM orders WHERE id = ?"
 	var order domain.Order

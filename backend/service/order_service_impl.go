@@ -60,57 +60,65 @@ func mapToPaymentStatus(paymentStatus string) domain.PaymentStatus {
 	}
 }
 
+func (service *OrderServiceImpl) FindAll(ctx context.Context) []web.OrderResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	orders := service.OrderRepository.FindAll(ctx, tx)
+	return helper.ToOrderResponses(orders)
+}
+
 func (service *OrderServiceImpl) CreateOrder(ctx context.Context, request web.OrderCreateRequest, userId int) web.OrderResponse {
-    tx, err := service.DB.Begin()
-    helper.PanicIfError(err)
-    defer helper.CommitOrRollback(tx)
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
 
-    user, err := service.UserRepository.FindById(ctx, tx, userId)
-    if err != nil {
-        panic(exception.NewNotFoundError(err.Error()))
-    }
+	user, err := service.UserRepository.FindById(ctx, tx, userId)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
-    // Fetch cart items for the user
+	// Fetch cart items for the user
 	cartItems, err := service.CartRepository.FindByUserId(ctx, tx, userId)
 	if err != nil {
 		panic(exception.NewNotFoundError(err.Error()))
 	}
 
-    // Calculate total items and total price from cart items
-    var totalItems int
-    var totalPrice int
+	// Calculate total items and total price from cart items
+	var totalItems int
+	var totalPrice int
 
-    for _, cartItem := range cartItems {
-        // Iterate through the products in the cart item
-        for _, product := range cartItem.Product {
-            totalItems += cartItem.Quantity
-            totalPrice += product.Price * cartItem.Quantity
-        }
+	for _, cartItem := range cartItems {
+		// Iterate through the products in the cart item
+		for _, product := range cartItem.Product {
+			totalItems += cartItem.Quantity
+			totalPrice += product.Price * cartItem.Quantity
+		}
 
-        // Delete the cart item
-        service.CartRepository.DeleteCart(ctx, tx, cartItem)
-    }
+		// Delete the cart item
+		service.CartRepository.DeleteCart(ctx, tx, cartItem)
+	}
 
-    // You can use the calculated totalItems and totalPrice to create the order
-    orderStatus := mapToOrderStatus("PENDING")     // Set the default order status
-    paymentStatus := mapToPaymentStatus("PENDING") // Set the default payment status
+	// You can use the calculated totalItems and totalPrice to create the order
+	orderStatus := mapToOrderStatus("PENDING")     // Set the default order status
+	paymentStatus := mapToPaymentStatus("PENDING") // Set the default payment status
 
-    order := domain.Order{
-        UserID:        user.Id,
-        CartId:        request.CartId,
-        OrderItems:    cartItems,
-        TotalItems:    totalItems,
-        TotalPrice:    totalPrice,
-        OrderStatus:   orderStatus,
-        PaymentStatus: paymentStatus,
-    }
+	order := domain.Order{
+		UserID:        user.Id,
+		CartId:        request.CartId,
+		OrderItems:    cartItems,
+		TotalItems:    totalItems,
+		TotalPrice:    totalPrice,
+		OrderStatus:   orderStatus,
+		PaymentStatus: paymentStatus,
+	}
 
-    // Insert the order into the database
-    order = service.OrderRepository.Insert(ctx, tx, order)
+	// Insert the order into the database
+	order = service.OrderRepository.Insert(ctx, tx, order)
 
-    return helper.ToOrderResponse(order)
+	return helper.ToOrderResponse(order)
 }
-
 
 func (service *OrderServiceImpl) UpdateOrder(ctx context.Context, request web.OrderUpdateRequest, Id int, userId int) web.OrderResponse {
 	err := service.Validate.Struct(request)

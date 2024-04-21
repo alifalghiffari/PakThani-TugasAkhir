@@ -18,7 +18,7 @@
           :to="{ name: 'ShowDetails', params: { id: cartItem.product[0].id } }"
         >
           <img
-            v-bind:src="cartItem.product[0].imageURL"
+            v-bind:src="cartItem.product[0].image"
             class="w-100 card-img-top embed-responsive-item"
           />
         </router-link>
@@ -46,12 +46,11 @@
           <p id="item-total-price" class="mb-0">
             Total Price:
             <span class="font-weight-bold">
-              $ {{ cartItem.product[0].price * cartItem.quantity }}</span
+             {{ cartItem.product[0].price * cartItem.quantity }}</span
             >
           </p>
           <br /><a href="#" class="text-right" @click="deleteItem(cartItem.id)"
-            >Remove From Cart</a
-          >
+            >Remove From Cart</a>
         </div>
       </div>
       <div class="col-2"></div>
@@ -60,7 +59,7 @@
 
     <!-- display total price -->
     <div class="total-cost pt-2 text-right">
-      <h5>Total : $ {{ totalcost }}</h5>
+      <h5>Total : {{ totalcost }}</h5>
       <button
         
         type="button"
@@ -81,6 +80,7 @@ export default {
       cartItems: [],
       token: localStorage.getItem('token'),
       totalcost: 0,
+      address: [],
     };
   },
   name: 'Cart',
@@ -103,51 +103,112 @@ export default {
             const result = response.data.data;
             // store cartitems and total price in two variables
             this.cartItems = result;
-            this.totalcost = result.total_price;
+            this.totalcost = 0;
+            for(let i = 0; i < this.cartItems.length; i++) {
+              for(let j = 0; j < this.cartItems[i].product.length; j++) {
+                this.totalcost += this.cartItems[i].product[j].price * this.cartItems[i].quantity;
+              }
+            }
           }
         })
         .catch((error) => {
           console.log(error);
         });
     },
-    // go to checkout page
+    fetchAddress() {
+      axios.get(`${this.baseURL}api/address/users`, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        }
+      }).then((response) => {
+        if (response.data.code === 200 && response.data.data.length > 0) {
+          const result = response.data.data[0];
+          this.address = result;
+        } else {
+          this.id = null; 
+        }
+      }).catch((err) => {
+        console.log(err);
+      })
+    },
     checkout() {
-      // this.$router.push({ name: 'Checkout' });
-      axios.post(`${this.baseURL}api/orders`, {
-          cart: this.cartItems.id,
-        }, {
-          headers: {
-            Authorization: `Bearer ${this.token}`,
-          },
-        })
-        .then((response) => {
-          if (response.data.code === 200) {
-            this.$router.push({
-              name: 'Checkout',
-              params: {
-                orderId: response.data.data.id,
-              },
-            });
+      swal({
+        title: "Confirm Order",
+        text: "Are you sure you want to place this order?",
+        icon: "warning",
+        buttons: ["Cancel", true],
+      }).then((willProceed) => {
+        if (willProceed) {
+          if (!this.address || Object.keys(this.address).length === 0) {
+            this.$router.push({ name: 'Address' });
+          } else {
+            swal({
+              title: "Confirm Address",
+              text: `This is your address: \n${this.address.kabupaten} \n${this.address.kecamatan} \n${this.address.kelurahan} \n${this.address.alamat}\n\nIf you want to change the address, please click Update.`,
+              icon: "warning",
+              buttons: {
+                cancel: "Cancel",
+                update: {
+                  text: "Update",
+                  value: "update",
+                },
+                ok: true,
+              }
+            }).then((value) => {
+              if (value === "update") {
+                this.$router.push({ name: 'Address' });
+              } else if (value) {
+                localStorage.setItem('totalcost', this.totalcost);
+                axios.post(`${this.baseURL}api/orders`, { cart: this.cartItems.id }, { headers: { Authorization: `Bearer ${this.token}` } })
+                .then((response) => {
+                  if (response.data.code === 200) {
+                    swal("Thanks For Orders", "", "success");
+                    this.$router.push({ name: 'Checkout', params: { orderId: response.data.data.id, totalcost: this.totalcost } });
+                  } else {
+                    swal("Error", response.data.message, "error");
+                  }
+                }).catch((error) => {
+                  console.log(error);
+                  swal("Error", "An error occurred while placing the order", "error");
+                });
+              }
+            })
           }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+        }
+      });
     },
     deleteItem(itemId) {
+      itemId = parseInt(itemId, 10);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        },
+        data: {
+          id: itemId
+        }
+      };
       axios
-        .delete(`${this.baseURL}cart/delete/${itemId}/?token=${this.token} `)
-        .then(
-          (response) => {
-            if (response.status == 200) {
-              this.$router.go(0);
-            }
-            this.$emit('fetchData');
-          },
-          (error) => {
-            console.log(error);
+        .delete(`${this.baseURL}api/carts/${itemId}`, config)
+        .then((response) => {
+          if (response.data.code === 200) {
+            swal({
+              text: "Product has been removed!",
+              icon: "success",
+              closeOnClickOutside: false,
+            });
+            const cartIndex = this.cartItems.findIndex(item => item.id === itemId);
+            const deletedItemCost = this.cartItems[cartIndex].product.reduce((acc, product) => acc + (product.price * this.cartItems[cartIndex].quantity), 0);
+            
+            this.totalcost -= deletedItemCost;
+
+            this.cartItems = this.cartItems.filter(item => item.id !== itemId);
           }
-        );
+          this.$emit('fetchData');
+        })
+        .catch((error) => {
+          console.log(error);
+          // Handle the error, e.g., show an error message
+        });
     },
     showDetails(productId) {
       this.$router.push({
@@ -159,6 +220,8 @@ export default {
   mounted() {
     this.token = localStorage.getItem('token');
     this.listCartItems();
+    this.fetchAddress();
+    this.checkout();
   },
 };
 </script>

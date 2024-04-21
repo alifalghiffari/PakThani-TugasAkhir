@@ -66,6 +66,7 @@ func ToOrderResponse(order domain.Order) web.OrderResponse {
 		TotalPrice:    order.TotalPrice,
 		OrderStatus:   string(order.OrderStatus),
 		PaymentStatus: string(order.PaymentStatus),
+		User:          ToUserResponses(order.User),
 	}
 }
 
@@ -75,6 +76,19 @@ func ToCartResponse(cart domain.Cart) web.CartResponse {
 		UserId:   cart.UserId,
 		Product:  ToProductResponses(cart.Product),
 		Quantity: cart.Quantity,
+	}
+}
+
+func ToAddressResponse(address domain.Address) web.AddressResponse {
+	return web.AddressResponse{
+		Id:        address.Id,
+		UserId:    address.UserId,
+		Kabupaten: address.Kabupaten,
+		Kecamatan: address.Kecamatan,
+		Kelurahan: address.Kelurahan,
+		Alamat:    address.Alamat,
+		Note:      address.Note,
+		User:      ToUserResponses(address.User),
 	}
 }
 
@@ -124,4 +138,13 @@ func ToCartResponses(carts []domain.Cart) []web.CartResponse {
 		cartResponses = append(cartResponses, ToCartResponse(cart))
 	}
 	return cartResponses
+}
+
+func ToAddressResponses(addresses []domain.Address) []web.AddressResponse {
+	var addressResponses []web.AddressResponse
+	for _, address := range addresses {
+		addressResponses = append(addressResponses, ToAddressResponse(address))
+	}
+
+	return addressResponses
 }

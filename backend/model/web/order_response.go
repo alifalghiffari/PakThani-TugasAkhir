@@ -8,4 +8,5 @@ type OrderResponse struct {
 	TotalPrice    int            `json:"total_price"`
 	OrderStatus   string         `json:"order_status"`
 	PaymentStatus string         `json:"payment_status"`
+	User          []UserResponse `json:"user"`
 }

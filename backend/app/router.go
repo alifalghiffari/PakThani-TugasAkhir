@@ -14,6 +14,7 @@ func NewRouter(categoryController controller.CategoryController,
 	accountController controller.AccountController,
 	userController controller.UserController,
 	cartController controller.CartController,
+	addressController controller.AddressController,
 	orderController controller.OrderController) *httprouter.Router {
 	router := httprouter.New()
 
@@ -25,6 +26,7 @@ func NewRouter(categoryController controller.CategoryController,
 	router.GET("/api/orders/edit/:orderId", authMiddleware.ApplyMiddleware(orderController.FindOrderById))
 	router.POST("/api/orders", authMiddleware.ApplyMiddleware(orderController.CreateOrder))
 	router.PUT("/api/orders/:orderId", authMiddleware.ApplyAdminMiddleware(orderController.UpdateOrder))
+	router.GET("/api/order", authMiddleware.ApplyAdminMiddleware(orderController.FindAll))
 
 	// Keranjang
 	router.POST("/api/carts", authMiddleware.ApplyMiddleware(cartController.AddToCart))
@@ -50,6 +52,9 @@ func NewRouter(categoryController controller.CategoryController,
 
 	// Akun
 	router.GET("/api/accounts", authMiddleware.ApplyMiddleware(accountController.UserDetailByID))
+	router.POST("/api/address", authMiddleware.ApplyMiddleware(addressController.AddAddress))
+	router.PUT("/api/address/update", authMiddleware.ApplyMiddleware(addressController.UpdateAddress))
+	router.GET("/api/address/users", authMiddleware.ApplyMiddleware(addressController.FindByUserId))
 
 	// Pengguna
 	router.POST("/api/users/register", userController.Register)

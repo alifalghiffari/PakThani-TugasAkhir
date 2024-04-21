@@ -2,24 +2,24 @@
   <div class="container">
     <div class="row">
       <div class="col-12 text-center">
-        <h4 class="pt-3">Your Orders</h4>
+        <h4 class="pt-3">Customers Orders</h4>
       </div>
     </div>
     <!--        for each order display -->
     <div v-for="order in orderList" :key="order.id" class="row mt-2 pt-3 justify-content-around">
       <div class="col-2"></div>
-      <div class="col-md-3 embed-responsive embed-responsive-16by9">
+      <!-- <div class="col-md-3 embed-responsive embed-responsive-16by9"> -->
         <!--                display image in left-->
-        <img v-bind:src="order.imageURL" class="w-100 card-img-top embed-responsive-item">
-      </div>
+        <!-- <img v-bind:src="order.imageURL" class="w-100 card-img-top embed-responsive-item"> -->
+      <!-- </div> -->
       <div class="col-md-5 px-3">
         <div class="card-block px-3">
           <h6 class="card-title">
             <router-link v-bind:to="'/order/'+order.id">Order No : {{order.id}}</router-link>
           </h6>
           <p class="mb-0">{{order.totalItems}} item<span v-if="order.totalItems > 1">s</span></p>
-          <p id="item-price" class="mb-0 font-weight-bold">Total Cost : $ {{order.totalCost}}</p>
-          <p id="item-total-price">Ordered on : {{order.orderdate}}</p>
+          <p id="item-price" class="mb-0 font-weight-bold">Total Cost : $ {{order.totalPrice}}</p>
+          <p id="item-username">Ordered By : {{order.username}}</p>
           <p id="item-status">Status : {{ order.orderStatus }}</p>
         </div>
       </div>
@@ -43,40 +43,66 @@
     props:["baseURL"],
     name: 'Order',
     methods: {
-      // list of order histories
-      listOrders(){
-        axios.get(`${this.baseURL}api/orders/users`, {
+      fecthOrder() {
+        axios.get(`${this.baseURL}api/order`, {
           headers: {
-            Authorization: `Bearer ${this.token}`,
+              Authorization: `Bearer ${this.token}`,
           },
-        })
-          .then((response) => {
-              if(response.status==200){
-                this.orders = response.data.data;
+        }).then((response) => {
+          if (response.status === 200) {
+            const orders = response.data.data;
+            orders.forEach((order) => {
+              this.orderList.push({
+                  id: order.id,
+                  totalItems: order.total_items,
+                  totalPrice: order.total_price,
+                  orderStatus: order.order_status,
+                  paymentStatus: order.payment_status,
+                  userId: order.user_id, 
+                  username: order.user[0].username, 
+              });
+            });
+            console.log(orders);
+          }
+        }).catch((err) => {
+            console.error(err);
+        });
+      }
+      // list of order histories
+      // listOrders(){
+      //   axios.get(`${this.baseURL}api/orders/users`, {
+      //     headers: {
+      //       Authorization: `Bearer ${this.token}`,
+      //     },
+      //   })
+      //     .then((response) => {
+      //         if(response.status==200){
+      //           this.orders = response.data.data;
                 // for each order populate orderList
-                this.orders.forEach((order) => {
-                  this.orderList.push({
-                    id: order.id,
-                    totalCost: order.totalPrice,
-                    orderStatus: order.order_status,
+                // this.orders.forEach((order) => {
+                //   this.orderList.push({
+                //     id: order.id,
+                //     totalCost: order.totalPrice,
+                //     orderStatus: order.order_status,
                     // get short date
                     //orderdate: order.createdDate.substring(0,10),
                     // get image of the first orderItem of the order
                     //imageURL: order.orderItems[0].product.imageURL,
                     // get total items
                     //totalItems: order.orderItems.length
-                  })
-                })
-              }
-            },
-            (error)=>{
-              console.log(error)
-            });
-      },
+            //       })
+            //     })
+            //   }
+            // },
+            // (error)=>{
+            //   console.log(error)
+            // });
+      //},
     },
     mounted() {
       this.token = localStorage.getItem("token");
-      this.listOrders();
+      //this.listOrders();
+      this.fecthOrder();
     },
   };
 
