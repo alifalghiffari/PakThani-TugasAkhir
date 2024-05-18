@@ -112,6 +112,7 @@ func (service *OrderServiceImpl) CreateOrder(ctx context.Context, request web.Or
 		TotalPrice:    totalPrice,
 		OrderStatus:   orderStatus,
 		PaymentStatus: paymentStatus,
+		User:          []domain.User{user},
 	}
 
 	// Insert the order into the database

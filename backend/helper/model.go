@@ -22,11 +22,12 @@ func ToUserResponse(user domain.User) web.UserResponse {
 	}
 
 	return web.UserResponse{
-		Id:       user.Id,
-		Username: user.Username,
-		Password: user.Password,
-		Email:    user.Email,
-		Role:     role,
+		Id:        user.Id,
+		Username:  user.Username,
+		Password:  user.Password,
+		Email:     user.Email,
+		NoTelepon: user.NoTelepon,
+		Role:      role,
 	}
 }
 
@@ -37,10 +38,11 @@ func ToAccountResponse(user domain.User) web.AccountResponse {
 	}
 
 	return web.AccountResponse{
-		Id:       user.Id,
-		Username: user.Username,
-		Email:    user.Email,
-		Role:     role,
+		Id:        user.Id,
+		Username:  user.Username,
+		Email:     user.Email,
+		NoTelepon: user.NoTelepon,
+		Role:      role,
 	}
 }
 
@@ -72,23 +74,26 @@ func ToOrderResponse(order domain.Order) web.OrderResponse {
 
 func ToCartResponse(cart domain.Cart) web.CartResponse {
 	return web.CartResponse{
-		Id:       cart.Id,
-		UserId:   cart.UserId,
-		Product:  ToProductResponses(cart.Product),
-		Quantity: cart.Quantity,
+		Id:         cart.Id,
+		UserId:     cart.UserId,
+		ProductId:  cart.ProductId,
+		Product:    ToProductResponses(cart.Product),
+		Quantity:   cart.Quantity,
+		TotalPrice: cart.TotalPrice,
 	}
 }
 
 func ToAddressResponse(address domain.Address) web.AddressResponse {
 	return web.AddressResponse{
-		Id:        address.Id,
-		UserId:    address.UserId,
-		Kabupaten: address.Kabupaten,
-		Kecamatan: address.Kecamatan,
-		Kelurahan: address.Kelurahan,
-		Alamat:    address.Alamat,
-		Note:      address.Note,
-		User:      ToUserResponses(address.User),
+		Id:           address.Id,
+		UserId:       address.UserId,
+		NamaPenerima: address.NamaPenerima,
+		Kabupaten:    address.Kabupaten,
+		Kecamatan:    address.Kecamatan,
+		Kelurahan:    address.Kelurahan,
+		Alamat:       address.Alamat,
+		Note:         address.Note,
+		User:         ToUserResponses(address.User),
 	}
 }
 

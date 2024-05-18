@@ -42,12 +42,13 @@ func (service *AddressServiceImpl) AddAddress(ctx context.Context, request web.A
 	}
 
 	address := domain.Address{
-		UserId:    user.Id,
-		Kabupaten: request.Kabupaten,
-		Kecamatan: request.Kecamatan,
-		Kelurahan: request.Kelurahan,
-		Alamat:    request.Alamat,
-		Note:      request.Note,
+		UserId:       user.Id,
+		NamaPenerima: request.NamaPenerima,
+		Kabupaten:    request.Kabupaten,
+		Kecamatan:    request.Kecamatan,
+		Kelurahan:    request.Kelurahan,
+		Alamat:       request.Alamat,
+		Note:         request.Note,
 	}
 
 	address = service.AddressRepository.AddAddress(ctx, tx, address)
@@ -69,13 +70,14 @@ func (service *AddressServiceImpl) UpdateAddress(ctx context.Context, request we
 	}
 
 	address := domain.Address{
-		Id:        request.Id,
-		UserId:    user.Id,
-		Kabupaten: request.Kabupaten,
-		Kecamatan: request.Kecamatan,
-		Kelurahan: request.Kelurahan,
-		Alamat:    request.Alamat,
-		Note:      request.Note,
+		Id:           request.Id,
+		UserId:       user.Id,
+		NamaPenerima: request.NamaPenerima,
+		Kabupaten:    request.Kabupaten,
+		Kecamatan:    request.Kecamatan,
+		Kelurahan:    request.Kelurahan,
+		Alamat:       request.Alamat,
+		Note:         request.Note,
 	}
 
 	address = service.AddressRepository.UpdateAddress(ctx, tx, address)

@@ -47,7 +47,7 @@ func (controller *OrderControllerImpl) FindOrderByUserId(writer http.ResponseWri
 func (controller *OrderControllerImpl) FindOrderById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	userId := request.Context().Value("userId").(int)
 
-	Id, err := strconv.Atoi(params.ByName("Id"))
+	Id, err := strconv.Atoi(params.ByName("orderId"))
 	helper.PanicIfError(err)
 
 	orderResponse := controller.OrderService.FindOrderById(request.Context(), Id, userId)

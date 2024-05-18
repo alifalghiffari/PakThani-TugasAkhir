@@ -1,18 +1,20 @@
 package web
 
 type AddressCreateRequest struct {
-	Kabupaten string `json:"kabupaten"`
-	Kecamatan string `json:"kecamatan"`
-	Kelurahan string `json:"kelurahan"`
-	Alamat    string `json:"alamat"`
-	Note      string `json:"note"`
+	NamaPenerima string `json:"nama_penerima"`
+	Kabupaten    string `json:"kabupaten"`
+	Kecamatan    string `json:"kecamatan"`
+	Kelurahan    string `json:"kelurahan"`
+	Alamat       string `json:"alamat"`
+	Note         string `json:"note"`
 }
 
 type AddressUpdateRequest struct {
-	Id        int    `json:"id"`
-	Kabupaten string `json:"kabupaten"`
-	Kecamatan string `json:"kecamatan"`
-	Kelurahan string `json:"kelurahan"`
-	Alamat    string `json:"alamat"`
-	Note      string `json:"note"`
+	Id           int    `json:"id"`
+	NamaPenerima string `json:"nama_penerima"`
+	Kabupaten    string `json:"kabupaten"`
+	Kecamatan    string `json:"kecamatan"`
+	Kelurahan    string `json:"kelurahan"`
+	Alamat       string `json:"alamat"`
+	Note         string `json:"note"`
 }

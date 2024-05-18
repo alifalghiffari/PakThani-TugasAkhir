@@ -49,10 +49,14 @@ func (service *CartServiceImpl) AddToCart(ctx context.Context, request web.CartC
 		panic(err)
 	}
 
+	products := []domain.Product{product}
+
 	cart := domain.Cart{
-		UserId:    user.Id,
-		ProductId: product.Id, // Use the product ID obtained from the repository
-		Quantity:  request.Quantity,
+		UserId:     user.Id,
+		ProductId:  request.ProductId,
+		Quantity:   request.Quantity,
+		Product:    products,
+		TotalPrice: product.Price * request.Quantity,
 	}
 	cart = service.CartRepository.AddToCart(ctx, tx, cart)
 
@@ -72,11 +76,20 @@ func (service *CartServiceImpl) UpdateCart(ctx context.Context, request web.Cart
 		panic(err)
 	}
 
+	product, err := service.ProductRepository.FindById(ctx, tx, request.ProductId)
+	if err != nil {
+		panic(err)
+	}
+
+	products := []domain.Product{product}
+
 	cart := domain.Cart{
-		Id:        request.Id,
-		UserId:    user.Id,
-		ProductId: request.ProductId,
-		Quantity:  request.Quantity,
+		Id:         request.Id,
+		UserId:     user.Id,
+		ProductId:  request.ProductId,
+		Quantity:   request.Quantity,
+		Product:    products,
+		TotalPrice: product.Price * request.Quantity,
 	}
 	cart = service.CartRepository.UpdateCart(ctx, tx, cart)
 

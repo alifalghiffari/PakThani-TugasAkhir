@@ -35,7 +35,7 @@ func (repository *CartRepositoryImpl) UpdateCart(ctx context.Context, tx *sql.Tx
 }
 
 func (repository *CartRepositoryImpl) DeleteCart(ctx context.Context, tx *sql.Tx, cart domain.Cart) domain.Cart {
-	SQL := "delete from cart where id = ?"
+	SQL := "UPDATE cart SET deleted_at = NOW() WHERE id = ?"
 	_, err := tx.ExecContext(ctx, SQL, cart.Id)
 	helper.PanicIfError(err)
 
@@ -68,10 +68,12 @@ func (repository *CartRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, 
 
 func (repository *CartRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.Tx, userId int) ([]domain.Cart, error) {
 	SQL := `
-		SELECT c.id, c.userId, c.product_id, c.quantity, p.name, p.price, p.image
+		SELECT c.id AS cart_id, c.userId, c.product_id, c.quantity, p.id AS product_id, p.name, p.price, p.image, p.description, p.category_id, cat.id AS category_id, cat.category
 		FROM cart c
 		LEFT JOIN product p ON c.product_id = p.id
-		WHERE c.userId = ?
+		LEFT JOIN category cat ON p.category_id = cat.id
+		WHERE c.userId = ? AND c.deleted_at IS NULL
+
     `
 	rows, err := tx.QueryContext(ctx, SQL, userId)
 	if err != nil {
@@ -83,9 +85,9 @@ func (repository *CartRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.
 	for rows.Next() {
 		cart := domain.Cart{}
 		product := domain.Product{}
-		if err := rows.Scan(&cart.Id, &cart.UserId, &product.Id, &cart.Quantity, &product.Name, &product.Price, &product.Image); err != nil {
-			return nil, err
-		}
+		category := domain.Category{}
+		err := rows.Scan(&cart.Id, &cart.UserId, &cart.ProductId, &cart.Quantity, &product.Id, &product.Name, &product.Price, &product.Image, &product.Description, &product.CategoryId, &category.Id, &product.Category.Category)
+		helper.PanicIfError(err)
 		cart.Product = append(cart.Product, product)
 		carts = append(carts, cart)
 	}

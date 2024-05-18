@@ -59,10 +59,11 @@ func (service *UserServiceImpl) Register(ctx context.Context, request web.UserCr
 	}
 
 	user := domain.User{
-		Username: request.Username,
-		Password: hashedPassword,
-		Email:    request.Email,
-		Role:     request.Role,
+		Username:  request.Username,
+		Password:  hashedPassword,
+		Email:     request.Email,
+		Role:      request.Role,
+		NoTelepon: request.NoTelepon,
 	}
 
 	user = service.UserRepository.Register(ctx, tx, user)

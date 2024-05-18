@@ -15,8 +15,8 @@ func NewAddressRepositoryImpl() AddressRepository {
 }
 
 func (repository *AddressRepositoryImpl) AddAddress(ctx context.Context, tx *sql.Tx, address domain.Address) domain.Address {
-	SQL := "INSERT INTO addresses(user_id, kabupaten, kecamatan, kelurahan, alamat, note) VALUES (?, ?, ?, ?, ?, ?)"
-	result, err := tx.ExecContext(ctx, SQL, address.UserId, address.Kabupaten, address.Kecamatan, address.Kelurahan, address.Alamat, address.Note)
+	SQL := "INSERT INTO addresses(user_id, nama_penerima, kabupaten, kecamatan, kelurahan, alamat, note) VALUES (?, ?, ?, ?, ?, ?, ?)"
+	result, err := tx.ExecContext(ctx, SQL, address.UserId, address.NamaPenerima ,address.Kabupaten, address.Kecamatan, address.Kelurahan, address.Alamat, address.Note)
 	helper.PanicIfError(err)
 
 	id, err := result.LastInsertId()
@@ -27,8 +27,8 @@ func (repository *AddressRepositoryImpl) AddAddress(ctx context.Context, tx *sql
 }
 
 func (repository *AddressRepositoryImpl) UpdateAddress(ctx context.Context, tx *sql.Tx, address domain.Address) domain.Address {
-	SQL := "UPDATE addresses SET kabupaten = ?, kecamatan = ?, kelurahan = ?, alamat = ?, note = ? WHERE id = ?"
-	_, err := tx.ExecContext(ctx, SQL, address.Kabupaten, address.Kecamatan, address.Kelurahan, address.Alamat, address.Note, address.Id)
+	SQL := "UPDATE addresses SET nama_penerima = ?, kabupaten = ?, kecamatan = ?, kelurahan = ?, alamat = ?, note = ? WHERE id = ?"
+	_, err := tx.ExecContext(ctx, SQL, address.NamaPenerima, address.Kabupaten, address.Kecamatan, address.Kelurahan, address.Alamat, address.Note, address.Id)
 	helper.PanicIfError(err)
 
 	return address
@@ -36,10 +36,10 @@ func (repository *AddressRepositoryImpl) UpdateAddress(ctx context.Context, tx *
 
 func (repository *AddressRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.Tx, userId int) ([]domain.Address, error) {
 	SQL := `
-		SELECT a.id, a.user_id, a.kabupaten, a.kecamatan, a.kelurahan, a.alamat, a.note, u.id
+		SELECT a.id, a.user_id, a.nama_penerima, a.kabupaten, a.kecamatan, a.kelurahan, a.alamat, a.note, u.id, u.username, u.email, u.role
 		FROM addresses a
 		LEFT JOIN user u ON a.user_id = u.id
-		WHERE a.user_id = ?
+		WHERE u.id = ?
 	`
 	rows, err := tx.QueryContext(ctx, SQL, userId)
 	if err != nil {
@@ -51,7 +51,7 @@ func (repository *AddressRepositoryImpl) FindByUserId(ctx context.Context, tx *s
 	for rows.Next() {
 		address := domain.Address{}
 		user := domain.User{}
-		if err := rows.Scan(&address.Id, &address.UserId, &address.Kabupaten, &address.Kecamatan, &address.Kelurahan, &address.Alamat, &address.Note, &user.Id); err != nil {
+		if err := rows.Scan(&address.Id, &address.UserId, &address.NamaPenerima, &address.Kabupaten, &address.Kecamatan, &address.Kelurahan, &address.Alamat, &address.Note, &user.Id, &user.Username, &user.Email, &user.Role); err != nil {
 			return nil, err
 		}
 		address.User = append(address.User, user)

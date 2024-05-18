@@ -42,9 +42,9 @@ func (repository *CategoryRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx
 
 func (repository *CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, categoryId int) (domain.Category, error) {
 	SQL := `
-		SELECT c.id, c.category, c.icon, p.id AS product_id, p.name AS product_name
+		SELECT c.id, c.category, c.icon, p.id AS product_id, p.name AS product_name, p.image AS product_image, p.description AS product_description, p.price AS product_price, p.category_id, c.category AS product_category
 		FROM category c
-		LEFT JOIN product p ON c.id = p.category_id
+		JOIN product p ON c.id = p.category_id
 		WHERE c.id = ?
 	`
 	rows, err := tx.QueryContext(ctx, SQL, categoryId)
@@ -54,7 +54,7 @@ func (repository *CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.
 	category.Products = make([]domain.Product, 0)
 	for rows.Next() {
 		product := domain.Product{}
-		err := rows.Scan(&category.Id, &category.Category, &category.Icon, &product.Id, &product.Name)
+		err := rows.Scan(&category.Id, &category.Category, &category.Icon, &product.Id, &product.Name, &product.Image, &product.Description, &product.Price, &product.CategoryId, &product.Category.Category)
 		helper.PanicIfError(err)
 		category.Products = append(category.Products, product)
 	}
@@ -62,17 +62,33 @@ func (repository *CategoryRepositoryImpl) FindById(ctx context.Context, tx *sql.
 }
 
 func (repository *CategoryRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Category {
-	SQL := "select id, category, icon from category"
+	SQL := `
+		SELECT c.id, c.category, c.icon, p.id AS product_id, p.name AS product_name, p.image AS product_image, p.description AS product_description, p.price AS product_price, p.category_id, c.category AS product_category
+		FROM category c
+		JOIN product p ON c.id = p.category_id
+	`
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
-	var categories []domain.Category
+	var categoriesMap = make(map[int]*domain.Category)
 	for rows.Next() {
 		category := domain.Category{}
-		err := rows.Scan(&category.Id, &category.Category, &category.Icon)
+		product := domain.Product{}
+		err := rows.Scan(&category.Id, &category.Category, &category.Icon, &product.Id, &product.Name, &product.Image, &product.Description, &product.Price, &product.CategoryId, &product.Category.Category)
 		helper.PanicIfError(err)
-		categories = append(categories, category)
+
+		if _, ok := categoriesMap[category.Id]; !ok {
+			categoriesMap[category.Id] = &category
+		}
+
+		categoriesMap[category.Id].Products = append(categoriesMap[category.Id].Products, product)
 	}
+
+	var categories []domain.Category
+	for _, category := range categoriesMap {
+		categories = append(categories, *category)
+	}
+
 	return categories
 }
