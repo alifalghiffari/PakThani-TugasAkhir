@@ -5,7 +5,8 @@ type UserResponse struct {
 	Username  string `json:"username"`
 	Password  string `json:"password"`
 	Email     string `json:"email"`
-	NoTelepon int    `json:"no_telepon"`
+	NoTelepon string `json:"no_telepon"`
 	Role      string `json:"role"`
 	Token     string `json:"token"`
+	Error     string `json:"error"`
 }

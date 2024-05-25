@@ -30,8 +30,8 @@ func (repository *UserRepositoryImpl) Register(ctx context.Context, tx *sql.Tx, 
 }
 
 func (repository *UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, user domain.User) domain.User {
-	SQL := "select id, username, password, email, no_telepon, role from user where username = ?"
-	rows, err := tx.QueryContext(ctx, SQL, user.Username)
+	SQL := "select id, username, password, email, no_telepon, role from user where email = ?"
+	rows, err := tx.QueryContext(ctx, SQL, user.Email)
 	if err != nil {
 		panic(err)
 	}
@@ -44,7 +44,7 @@ func (repository *UserRepositoryImpl) Login(ctx context.Context, tx *sql.Tx, use
 		}
 		return user
 	} else {
-		panic("username or password is incorrect")
+		panic("email or password is incorrect")
 	}
 }
 
@@ -113,6 +113,26 @@ func (repository *UserRepositoryImpl) FindByRole(ctx context.Context, tx *sql.Tx
 func (repository *UserRepositoryImpl) FindByUsername(ctx context.Context, tx *sql.Tx, username string) (domain.User, error) {
 	SQL := "select id, username, password, email, no_telepon, role from user where username = ?"
 	rows, err := tx.QueryContext(ctx, SQL, username)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	user := domain.User{}
+	if rows.Next() {
+		err := rows.Scan(&user.Id, &user.Username, &user.Password, &user.Email, &user.NoTelepon, &user.Role)
+		if err != nil {
+			panic(err)
+		}
+		return user, nil
+	} else {
+		return user, err
+	}
+}
+
+func (repository *UserRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.User, error) {
+	SQL := "select id, username, password, email, no_telepon, role from user where email = ?"
+	rows, err := tx.QueryContext(ctx, SQL, email)
 	if err != nil {
 		panic(err)
 	}

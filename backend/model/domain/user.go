@@ -8,7 +8,7 @@ type User struct {
 	Password   string
 	Email      string
 	Role       bool
-	NoTelepon  int
+	NoTelepon  string
 	Created_at time.Time
 	Updated_at time.Time
 	Token      string

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
+	"unicode"
 
 	"project-workshop/go-api-ecom/helper"
 	"project-workshop/go-api-ecom/model/domain"
@@ -24,9 +25,9 @@ type UserServiceImpl struct {
 }
 
 type Claims struct {
-	Username string
-	UserID   int
-	Role     bool
+	Email  string
+	UserID int
+	Role   bool
 	jwt.RegisteredClaims
 }
 
@@ -42,20 +43,25 @@ func (service *UserServiceImpl) Register(ctx context.Context, request web.UserCr
 	err := service.Validate.Struct(request)
 	if err != nil {
 		fmt.Println("Validation error:", err)
-		return web.UserResponse{} // or return an error response
+		return web.UserResponse{} 
+	}
+
+	if !IsValidPassword(request.Password) {
+		fmt.Println("Password does not meet security criteria")
+		return web.UserResponse{Error: "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character"}
 	}
 
 	tx, err := service.DB.Begin()
 	if err != nil {
 		fmt.Println("DB Begin error:", err)
-		return web.UserResponse{} // or return an error response
+		return web.UserResponse{} 
 	}
 	defer helper.CommitOrRollback(tx)
 
 	hashedPassword, err := HashPassword(request.Password)
 	if err != nil {
 		fmt.Println("HashPassword error:", err)
-		return web.UserResponse{} // or return an error response
+		return web.UserResponse{} 
 	}
 
 	user := domain.User{
@@ -83,17 +89,17 @@ func (service *UserServiceImpl) Login(ctx context.Context, request web.UserLogin
 	}
 	defer helper.CommitOrRollback(tx)
 
-	user, err := service.UserRepository.FindByUsername(ctx, tx, request.Username)
+	user, err := service.UserRepository.FindByEmail(ctx, tx, request.Email)
 	if err != nil {
 		return web.UserResponse{}, err
 	}
 
 	err = ComparePassword(user.Password, request.Password)
 	if err != nil {
-		return web.UserResponse{}, err // Passwords don't match
+		return web.UserResponse{}, err
 	}
 
-	token, err := GenerateToken(user.Username, user.Role, user.Id, "yourSecretKey")
+	token, err := GenerateToken(user.Email, user.Role, user.Id, "yourSecretKey")
 	if err != nil {
 		return web.UserResponse{}, err
 	}
@@ -104,28 +110,57 @@ func (service *UserServiceImpl) Login(ctx context.Context, request web.UserLogin
 	return userResponse, nil
 }
 
-// generate token with claims username and role
-func GenerateToken(username string, role bool, userId int, secretKey string) (string, error) {
-	// Set custom claims
+//utilities function >>>
+
+func GenerateToken(email string, role bool, userId int, secretKey string) (string, error) {
 	claims := &Claims{
-		Username: username,
-		UserID:   userId,
-		Role:     role,
+		Email:  email,
+		UserID: userId,
+		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		},
 	}
 
-	// Declare the token with the algorithm used for signing, and the claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	// Create the JWT string
 	tokenString, err := token.SignedString([]byte("secretKey"))
 	if err != nil {
 		return "", err
 	}
 
 	return tokenString, nil
+}
+
+func IsValidPassword(password string) bool {
+    var (
+        hasMinLen  = false
+        hasUpper   = false
+        hasLower   = false
+        hasNumber  = false
+        hasSpecial = false
+    )
+
+    // Panjang minimal 8 karakter
+    if len(password) >= 8 {
+        hasMinLen = true
+    }
+
+    for _, char := range password {
+        switch {
+        case unicode.IsUpper(char):
+            hasUpper = true
+        case unicode.IsLower(char):
+            hasLower = true
+        case unicode.IsDigit(char):
+            hasNumber = true
+        case unicode.IsPunct(char) || unicode.IsSymbol(char):
+            hasSpecial = true
+        }
+    }
+
+    // Setidaknya harus ada satu karakter dari setiap kriteria
+    return hasMinLen && hasUpper && hasLower && hasNumber && hasSpecial
 }
 
 func HashPassword(password string) (string, error) {
