@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"project-workshop/go-api-ecom/exception"
 	"project-workshop/go-api-ecom/helper"
 	"project-workshop/go-api-ecom/model/domain"
@@ -47,6 +48,10 @@ func (service *CartServiceImpl) AddToCart(ctx context.Context, request web.CartC
 	product, err := service.ProductRepository.FindById(ctx, tx, request.ProductId)
 	if err != nil {
 		panic(err)
+	}
+
+	if product.Quantity < request.Quantity {
+		panic(errors.New("Stock is not enough"))
 	}
 
 	products := []domain.Product{product}
