@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"net/smtp"
+	"os"
 
 	"project-workshop/go-api-ecom/app"
 	"project-workshop/go-api-ecom/controller"
@@ -12,13 +15,23 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 )
 
 func main() {
 
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
 	db := app.NewDB()
 	validate := validator.New()
+	smtpAuth := smtp.PlainAuth("PakThani", os.Getenv("SMTP_EMAIL"), os.Getenv("SMTP_PASSWORD"), os.Getenv("SMTP_HOST"))
+	smtpHost := os.Getenv("SMTP_HOST")
+	smtpPort := os.Getenv("SMTP_PORT")
+
 	categoryRepository := repository.NewCategoryRepository()
 	categoryService := service.NewCategoryService(categoryRepository, db, validate)
 	categoryController := controller.NewCategoryController(categoryService)
@@ -28,7 +41,7 @@ func main() {
 	productController := controller.NewProductController(productService)
 
 	userRepository := repository.NewUserRepository()
-	userService := service.NewUserService(userRepository, db, validate)
+	userService := service.NewUserService(userRepository, db, validate, smtpAuth, smtpHost, smtpPort)
 	userController := controller.NewUserController(userService)
 
 	accountRepository := repository.NewUserRepository()
@@ -65,6 +78,6 @@ func main() {
 		Handler: handler,
 	}
 
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 	helper.PanicIfError(err)
 }

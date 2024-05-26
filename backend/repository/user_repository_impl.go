@@ -149,3 +149,13 @@ func (repository *UserRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.T
 		return user, err
 	}
 }
+
+func (repository *UserRepositoryImpl) UpdatePassword(ctx context.Context, tx *sql.Tx, user domain.User) domain.User {
+	SQL := "update user set password = ? where email = ?"
+	_, err := tx.ExecContext(ctx, SQL, user.Password, user.Email)
+	if err != nil {
+		panic(err)
+	}
+
+	return user
+}

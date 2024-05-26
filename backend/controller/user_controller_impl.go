@@ -58,3 +58,35 @@ func (controller *UserControllerImpl) Login(writer http.ResponseWriter, request 
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *UserControllerImpl) ForgotPassword(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	Email := request.Context().Value("Email").(string)
+	
+	forgotPasswordRequest := web.ForgotPasswordRequest{}
+	helper.ReadFromRequestBody(request, &forgotPasswordRequest)
+
+	userResponse := controller.UserService.ForgotPassword(request.Context(), forgotPasswordRequest, Email)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   userResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
+func (controller *UserControllerImpl) ResetPassword(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	Email := request.Context().Value("Email").(string)
+	
+	resetPasswordRequest := web.ResetPasswordRequest{}
+	helper.ReadFromRequestBody(request, &resetPasswordRequest)
+
+	userResponse := controller.UserService.ResetPassword(request.Context(), resetPasswordRequest, Email)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   userResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
