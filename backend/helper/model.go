@@ -61,25 +61,34 @@ func ToProductResponse(product domain.Product) web.ProductResponse {
 
 func ToOrderResponse(order domain.Order) web.OrderResponse {
 	return web.OrderResponse{
-		ID:            order.ID,
-		UserID:        order.UserID,
-		OrderItem:     ToCartResponses(order.OrderItems),
+		Id:            order.Id,
+		UserId:        order.UserId,
 		TotalItems:    order.TotalItems,
 		TotalPrice:    order.TotalPrice,
 		OrderStatus:   string(order.OrderStatus),
 		PaymentStatus: string(order.PaymentStatus),
-		User:          ToUserResponses(order.User),
+		OrderItems:    ToOrderItemsResponses(order.OrderItems),
+	}
+}
+
+func ToOrderItemsResponse(orderItems domain.OrderItems) web.OrderItemsResponse {
+	return web.OrderItemsResponse{
+		Id:        orderItems.Id,
+		OrderId:   orderItems.OrderId,
+		ProductId: orderItems.ProductId,
+		Quantity:  orderItems.Quantity,
+		Price:     orderItems.Price,
 	}
 }
 
 func ToCartResponse(cart domain.Cart) web.CartResponse {
 	return web.CartResponse{
-		Id:         cart.Id,
-		UserId:     cart.UserId,
-		ProductId:  cart.ProductId,
-		Product:    ToProductResponses(cart.Product),
-		Quantity:   cart.Quantity,
-		TotalPrice: cart.TotalPrice,
+		Id:        cart.Id,
+		UserId:    cart.UserId,
+		ProductId: cart.ProductId,
+		Product:   ToProductResponses(cart.Product),
+		Quantity:  cart.Quantity,
+		Price:     cart.Price,
 	}
 }
 
@@ -135,6 +144,14 @@ func ToOrderResponses(orders []domain.Order) []web.OrderResponse {
 		orderResponses = append(orderResponses, ToOrderResponse(order))
 	}
 	return orderResponses
+}
+
+func ToOrderItemsResponses(orderItems []domain.OrderItems) []web.OrderItemsResponse {
+	var orderItemsResponse []web.OrderItemsResponse
+	for _, orderItem := range orderItems {
+		orderItemsResponse = append(orderItemsResponse, ToOrderItemsResponse(orderItem))
+	}
+	return orderItemsResponse
 }
 
 func ToCartResponses(carts []domain.Cart) []web.CartResponse {

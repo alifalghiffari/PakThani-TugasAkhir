@@ -57,11 +57,11 @@ func (service *CartServiceImpl) AddToCart(ctx context.Context, request web.CartC
 	products := []domain.Product{product}
 
 	cart := domain.Cart{
-		UserId:     user.Id,
-		ProductId:  request.ProductId,
-		Quantity:   request.Quantity,
-		Product:    products,
-		TotalPrice: product.Price * request.Quantity,
+		UserId:    user.Id,
+		ProductId: request.ProductId,
+		Quantity:  request.Quantity,
+		Product:   products,
+		Price:     product.Price * request.Quantity,
 	}
 	cart = service.CartRepository.AddToCart(ctx, tx, cart)
 
@@ -89,12 +89,12 @@ func (service *CartServiceImpl) UpdateCart(ctx context.Context, request web.Cart
 	products := []domain.Product{product}
 
 	cart := domain.Cart{
-		Id:         request.Id,
-		UserId:     user.Id,
-		ProductId:  request.ProductId,
-		Quantity:   request.Quantity,
-		Product:    products,
-		TotalPrice: product.Price * request.Quantity,
+		Id:        request.Id,
+		UserId:    user.Id,
+		ProductId: request.ProductId,
+		Quantity:  request.Quantity,
+		Product:   products,
+		Price:     product.Price * request.Quantity,
 	}
 	cart = service.CartRepository.UpdateCart(ctx, tx, cart)
 
@@ -124,18 +124,28 @@ func (service *CartServiceImpl) DeleteCart(ctx context.Context, request web.Cart
 }
 
 // Service method to find a single cart by ID
-func (service *CartServiceImpl) FindById(ctx context.Context, cartId int) web.CartResponse {
+func (service *CartServiceImpl) FindById(ctx context.Context, cartId []int) web.CartResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
 	// Fetch a single cart by its ID
-	cart, err := service.CartRepository.FindById(ctx, tx, []int{cartId})
+	cart, err := service.CartRepository.FindById(ctx, tx, cartId)
 	if err != nil {
 		panic(exception.NewNotFoundError(err.Error()))
 	}
 
-	return helper.ToCartResponse(cart[0])
+	var cartResponses []web.CartResponse
+    for _, carts := range cart {
+        cartResponse := web.CartResponse{
+            Id:        carts.Id,
+            ProductId: carts.ProductId,
+            Quantity:  carts.Quantity,
+            Price:     carts.Price,
+        }
+        cartResponses = append(cartResponses, cartResponse)
+    }
+    return cartResponses[0]
 }
 
 func (service *CartServiceImpl) FindByUserId(ctx context.Context, userId int) []web.CartResponse {

@@ -5,7 +5,7 @@ import (
 	"project-workshop/go-api-ecom/helper"
 	"project-workshop/go-api-ecom/model/web"
 	"project-workshop/go-api-ecom/service"
-	"strconv"
+	// "strconv"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -66,11 +66,10 @@ func (controller *CartControllerImpl) DeleteCart(writer http.ResponseWriter, req
 }
 
 func (controller *CartControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	cartId := params.ByName("cartId")
-	id, err := strconv.Atoi(cartId)
-	helper.PanicIfError(err)
+	cartIdRequest := web.CartIdRequest{}
+	helper.ReadFromRequestBody(request, &cartIdRequest)
 
-	cartResponse := controller.CartService.FindById(request.Context(), id)
+	cartResponse := controller.CartService.FindById(request.Context(), cartIdRequest.Id)
 	webResponse := web.WebResponse{
 		Code:   200,
 		Status: "OK",

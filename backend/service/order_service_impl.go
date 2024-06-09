@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"log"
 	"project-workshop/go-api-ecom/exception"
 	"project-workshop/go-api-ecom/helper"
 	"project-workshop/go-api-ecom/model/domain"
@@ -13,20 +14,22 @@ import (
 )
 
 type OrderServiceImpl struct {
-	OrderRepository repository.OrderRepository
-	UserRepository  repository.UserRepository
-	CartRepository  repository.CartRepository
-	DB              *sql.DB
-	Validate        *validator.Validate
+	OrderRepository      repository.OrderRepository
+	UserRepository       repository.UserRepository
+	CartRepository       repository.CartRepository
+	OrderItemsRepository repository.OrderItemsRepository
+	DB                   *sql.DB
+	Validate             *validator.Validate
 }
 
-func NewOrderService(orderRepository repository.OrderRepository, userRepository repository.UserRepository, cartRepository repository.CartRepository, DB *sql.DB, validate *validator.Validate) OrderService {
+func NewOrderService(orderRepository repository.OrderRepository, userRepository repository.UserRepository, cartRepository repository.CartRepository, orderItemsRepository repository.OrderItemsRepository, DB *sql.DB, validate *validator.Validate) OrderService {
 	return &OrderServiceImpl{
-		OrderRepository: orderRepository,
-		UserRepository:  userRepository,
-		CartRepository:  cartRepository,
-		DB:              DB,
-		Validate:        validate,
+		OrderRepository:      orderRepository,
+		UserRepository:       userRepository,
+		CartRepository:       cartRepository,
+		OrderItemsRepository: orderItemsRepository,
+		DB:                   DB,
+		Validate:             validate,
 	}
 }
 
@@ -69,56 +72,90 @@ func (service *OrderServiceImpl) FindAll(ctx context.Context) []web.OrderRespons
 	return helper.ToOrderResponses(orders)
 }
 
+// create order mengambil data total items, total price yang berasal dari order items yang dimana order items tersebut
+// buatkan order items setelah berhasil membuat order
 func (service *OrderServiceImpl) CreateOrder(ctx context.Context, request web.OrderCreateRequest, userId int) web.OrderResponse {
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
+    err := service.Validate.Struct(request)
+    if err != nil {
+        log.Printf("Validation error: %v", err)
+        helper.PanicIfError(err)
+    }
 
-	user, err := service.UserRepository.FindById(ctx, tx, userId)
-	if err != nil {
-		panic(exception.NewNotFoundError(err.Error()))
-	}
+    tx, err := service.DB.Begin()
+    helper.PanicIfError(err)
+    defer helper.CommitOrRollback(tx)
 
-	// Fetch cart items for the user
-	cartItems, err := service.CartRepository.FindByUserId(ctx, tx, userId)
-	if err != nil {
-		panic(exception.NewNotFoundError(err.Error()))
-	}
+    user, err := service.UserRepository.FindById(ctx, tx, userId)
+    if err != nil {
+        log.Printf("User not found error: %v", err)
+        panic(exception.NewNotFoundError(err.Error()))
+    }
 
-	// Calculate total items and total price from cart items
-	var totalItems int
-	var totalPrice int
+    cart, err := service.CartRepository.FindByUserId(ctx, tx, userId)
+    if err != nil {
+        log.Printf("Cart not found error: %v", err)
+        panic(exception.NewNotFoundError(err.Error()))
+    }
 
-	for _, cartItem := range cartItems {
-		// Iterate through the products in the cart item
-		for _, product := range cartItem.Product {
-			totalItems += cartItem.Quantity
-			totalPrice += product.Price * cartItem.Quantity
-		}
+    if len(cart) == 0 {
+        log.Println("Cart is empty")
+        panic(exception.NewNotFoundError("Cart is empty"))
+    }
 
-		// Delete the cart item
-		service.CartRepository.DeleteCart(ctx, tx, cartItem)
-	}
+    totalItems := 0
+    totalPrice := 0
+    for _, cartItem := range cart {
+        totalItems += cartItem.Quantity
+        totalPrice += cartItem.Quantity * cartItem.Price
+    }
 
-	// You can use the calculated totalItems and totalPrice to create the order
-	orderStatus := mapToOrderStatus("PENDING")     // Set the default order status
-	paymentStatus := mapToPaymentStatus("PENDING") // Set the default payment status
+    orderStatus := domain.Pending
+	paymentStatus := domain.PaymentPending
 
-	order := domain.Order{
-		UserID:        user.Id,
-		CartId:        request.CartId,
-		OrderItems:    cartItems,
-		TotalItems:    totalItems,
-		TotalPrice:    totalPrice,
-		OrderStatus:   orderStatus,
-		PaymentStatus: paymentStatus,
-		User:          []domain.User{user},
-	}
+    order := domain.Order{
+        UserId:        user.Id,
+        TotalItems:    totalItems,
+        TotalPrice:    totalPrice,
+        OrderStatus:   orderStatus,
+        PaymentStatus: paymentStatus,
+    }
 
-	// Insert the order into the database
-	order = service.OrderRepository.Insert(ctx, tx, order)
+    // Insert order to get order ID
+    order = service.OrderRepository.Insert(ctx, tx, order)
+    if err != nil {
+        log.Printf("Order insert error: %v", err)
+        helper.PanicIfError(err)
+    }
 
-	return helper.ToOrderResponse(order)
+    var orderItems []domain.OrderItems
+    for _, cartItem := range cart {
+        orderItem := domain.OrderItems{
+            OrderId:   order.Id, // Ensure the correct OrderId is used
+            ProductId: cartItem.ProductId,
+            Quantity:  cartItem.Quantity,
+            Price:     cartItem.Price,
+        }
+        orderItems = append(orderItems, orderItem)
+    }
+
+    for _, item := range orderItems {
+        service.OrderItemsRepository.Insert(ctx, tx, item)
+        if err != nil {
+            log.Printf("OrderItems insert error: %v", err)
+            helper.PanicIfError(err)
+        }
+    }
+
+    // Clear the cart after order is created
+    for _, cartItem := range cart {
+        service.CartRepository.DeleteCart(ctx, tx, cartItem)
+        if err != nil {
+            log.Printf("Cart delete error: %v", err)
+            helper.PanicIfError(err)
+        }
+    }
+
+    return helper.ToOrderResponse(order)
 }
 
 func (service *OrderServiceImpl) UpdateOrder(ctx context.Context, request web.OrderUpdateRequest, Id int, userId int) web.OrderResponse {
@@ -134,7 +171,7 @@ func (service *OrderServiceImpl) UpdateOrder(ctx context.Context, request web.Or
 		panic(exception.NewNotFoundError(err.Error()))
 	}
 
-	if order.UserID != userId {
+	if order.UserId != userId {
 		helper.PanicIfError(err)
 	}
 
@@ -142,8 +179,8 @@ func (service *OrderServiceImpl) UpdateOrder(ctx context.Context, request web.Or
 	paymentStatus := mapToPaymentStatus(request.PaymentStatus)
 
 	order = domain.Order{
-		ID:            order.ID,
-		UserID:        order.UserID,
+		Id:            order.Id,
+		UserId:        order.UserId,
 		OrderStatus:   orderStatus,
 		PaymentStatus: paymentStatus,
 	}
@@ -176,7 +213,7 @@ func (service *OrderServiceImpl) FindOrderById(ctx context.Context, Id int, user
 		panic(exception.NewNotFoundError(err.Error()))
 	}
 
-	if order.UserID != userId {
+	if order.UserId != userId {
 		helper.PanicIfError(err)
 	}
 

@@ -2,17 +2,13 @@ package domain
 
 // Order mendefinisikan sebuah pesanan
 type Order struct {
-	ID         int    // ID unik untuk pesanan
-	UserID     int    // ID pengguna yang membuat pesanan
-	CartId     []int  // ID keranjang yang berisi item pesanan
-	OrderItems []Cart // Daftar item dalam pesanan
-	TotalItems int    // Jumlah total item dalam pesanan
-	TotalPrice int    // Harga total dari semua item dalam pesanan
-	// ShippingCost  float64       // Biaya pengiriman pesanan
-	// GrandTotal    float64       // Total keseluruhan pesanan setelah ditambah biaya pengiriman
+	Id            int           // ID unik untuk pesanan
+	UserId        int           // ID pengguna yang membuat pesanan
+	TotalItems    int           // Jumlah total item dalam pesanan
+	TotalPrice    int           // Harga total dari pesanan
 	OrderStatus   OrderStatus   // Status pesanan (misalnya: pending, diproses, selesai, dll.)
 	PaymentStatus PaymentStatus // Status pembayaran pesanan (misalnya: pending, berhasil, gagal, dll.)
-	User          []User
+	OrderItems    []OrderItems  // Item dalam pesanan
 }
 
 // OrderStatus mendefinisikan status pesanan

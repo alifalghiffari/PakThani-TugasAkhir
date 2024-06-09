@@ -15,36 +15,39 @@ func NewOrderRepositoryImpl() OrderRepository {
 }
 
 func (repository *OrderRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Order {
-	SQL := `
-        SELECT o.id, o.user_id, o.total_items, o.total_price, o.order_status, o.payment_status, u.id, u.username
-        FROM orders o
-        INNER JOIN user u ON o.user_id = u.id
-    `
-	rows, err := tx.QueryContext(ctx, SQL)
+	query := "SELECT id, user_id, total_items, total_price, order_status, payment_status FROM orders"
+	rows, err := tx.QueryContext(ctx, query)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
 	var orders []domain.Order
 	for rows.Next() {
-		order := domain.Order{}
-		user := domain.User{}
-		err := rows.Scan(&order.ID, &order.UserID, &order.TotalItems, &order.TotalPrice, &order.OrderStatus, &order.PaymentStatus, &user.Id, &user.Username)
+		var order domain.Order
+		err := rows.Scan(
+			&order.Id, &order.UserId, &order.OrderStatus, &order.PaymentStatus,
+		)
 		helper.PanicIfError(err)
-		order.User = append(order.User, user)
 		orders = append(orders, order)
 	}
-
 	return orders
 }
 
 func (repository *OrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, orderId int) (domain.Order, error) {
 	query := "SELECT id, user_id, total_items, total_price, order_status, payment_status FROM orders WHERE id = ?"
-	var order domain.Order
-	err := tx.QueryRowContext(ctx, query, orderId).Scan(
-		&order.ID, &order.UserID, &order.TotalItems, &order.TotalPrice, &order.OrderStatus, &order.PaymentStatus,
-	)
+	rows, err := tx.QueryContext(ctx, query, orderId)
 	helper.PanicIfError(err)
-	return order, err
+	defer rows.Close()
+
+	var order domain.Order
+	if rows.Next() {
+		err := rows.Scan(
+			&order.Id, &order.UserId, &order.OrderStatus, &order.PaymentStatus,
+		)
+		helper.PanicIfError(err)
+		return order, nil
+	} else {
+		return order, nil
+	}
 }
 
 func (repository *OrderRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.Tx, userId int) ([]domain.Order, error) {
@@ -57,29 +60,29 @@ func (repository *OrderRepositoryImpl) FindByUserId(ctx context.Context, tx *sql
 	for rows.Next() {
 		var order domain.Order
 		err := rows.Scan(
-			&order.ID, &order.UserID, &order.TotalItems, &order.TotalPrice, &order.OrderStatus, &order.PaymentStatus,
+			&order.Id, &order.UserId, &order.OrderStatus, &order.PaymentStatus,
 		)
 		helper.PanicIfError(err)
 		orders = append(orders, order)
 	}
-	return orders, err
+	return orders, nil
 }
 
 func (repository *OrderRepositoryImpl) Insert(ctx context.Context, tx *sql.Tx, order domain.Order) domain.Order {
-	query := "INSERT INTO orders(user_id, total_items, total_price, order_status, payment_status) VALUES (?, ?, ?, ?, ?)"
-	result, err := tx.ExecContext(ctx, query, order.UserID, order.TotalItems, order.TotalPrice, order.OrderStatus, order.PaymentStatus)
+	query := "INSERT INTO orders(user_id, total_items, total_price, order_status, payment_status) VALUES(?, ?, ?, ?, ?)"
+	result, err := tx.ExecContext(ctx, query, order.UserId, order.TotalItems, order.TotalPrice, order.OrderStatus, order.PaymentStatus)
 	helper.PanicIfError(err)
 
 	id, err := result.LastInsertId()
 	helper.PanicIfError(err)
 
-	order.ID = int(id)
+	order.Id = int(id)
 	return order
 }
 
 func (repository *OrderRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, order domain.Order) domain.Order {
 	query := "UPDATE orders SET order_status = ?, payment_status = ? WHERE id = ?"
-	_, err := tx.ExecContext(ctx, query, order.OrderStatus, order.PaymentStatus, order.ID)
+	_, err := tx.ExecContext(ctx, query, order.OrderStatus, order.PaymentStatus, order.Id)
 	helper.PanicIfError(err)
 
 	return order

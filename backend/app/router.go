@@ -15,7 +15,8 @@ func NewRouter(categoryController controller.CategoryController,
 	userController controller.UserController,
 	cartController controller.CartController,
 	addressController controller.AddressController,
-	orderController controller.OrderController) *httprouter.Router {
+	orderController controller.OrderController,
+	orderItemsController controller.OrderItemsController) *httprouter.Router {
 	router := httprouter.New()
 
 	// Middleware
@@ -28,11 +29,17 @@ func NewRouter(categoryController controller.CategoryController,
 	router.PUT("/api/orders/:orderId", authMiddleware.ApplyAdminMiddleware(orderController.UpdateOrder))
 	router.GET("/api/order", authMiddleware.ApplyAdminMiddleware(orderController.FindAll))
 
+	// Order Items
+	router.GET("/api/orderitems/edit/:orderItemId", authMiddleware.ApplyMiddleware(orderItemsController.FindOrderItemsById))
+	router.GET("/api/orderitems/carts/:cartId", authMiddleware.ApplyMiddleware(orderItemsController.FindOrderItemsByCartId))
+	router.GET("/api/orderitems/users", authMiddleware.ApplyMiddleware(orderItemsController.FindOrderItemsByUserId))
+	// router.POST("/api/orderitems", authMiddleware.ApplyMiddleware(orderItemsController.CreateOrderItems))
+
 	// Keranjang
 	router.POST("/api/carts", authMiddleware.ApplyMiddleware(cartController.AddToCart))
 	router.PUT("/api/carts", authMiddleware.ApplyMiddleware(cartController.UpdateCart))
 	router.DELETE("/api/carts", authMiddleware.ApplyMiddleware(cartController.DeleteCart))
-	router.GET("/api/carts/edit/:cartId", authMiddleware.ApplyMiddleware(cartController.FindById))
+	router.GET("/api/carts/edit", authMiddleware.ApplyMiddleware(cartController.FindById))
 	router.GET("/api/carts/users", authMiddleware.ApplyMiddleware(cartController.FindByUserId))
 	router.GET("/api/carts", authMiddleware.ApplyMiddleware(cartController.FindAll))
 
@@ -59,6 +66,10 @@ func NewRouter(categoryController controller.CategoryController,
 	// Pengguna
 	router.POST("/api/users/register", userController.Register)
 	router.POST("/api/users/login", userController.Login)
+
+	// Password
+	router.POST("/api/users/forgot-password", userController.ForgotPassword)
+	router.POST("/api/users/reset-password", userController.ResetPassword)
 
 	router.PanicHandler = exception.ErrorHandler
 

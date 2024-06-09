@@ -33,22 +33,25 @@ func main() {
 	smtpPort := os.Getenv("SMTP_PORT")
 
 	categoryRepository := repository.NewCategoryRepository()
+	productRepository := repository.NewProductRepository()
+	userRepository := repository.NewUserRepository()
+	accountRepository := repository.NewUserRepository()
+	cartRepository := repository.NewCartRepositoryImpl()
+	orderItemsRepository := repository.NewOrderItemsRepositoryImpl()
+	orderRepository := repository.NewOrderRepositoryImpl()
+
 	categoryService := service.NewCategoryService(categoryRepository, db, validate)
 	categoryController := controller.NewCategoryController(categoryService)
 
-	productRepository := repository.NewProductRepository()
 	productService := service.NewProductService(productRepository, db, validate)
 	productController := controller.NewProductController(productService)
 
-	userRepository := repository.NewUserRepository()
 	userService := service.NewUserService(userRepository, db, validate, smtpAuth, smtpHost, smtpPort)
 	userController := controller.NewUserController(userService)
 
-	accountRepository := repository.NewUserRepository()
 	accountService := service.NewAccountService(accountRepository, db)
 	accountController := controller.NewAccountController(accountService)
 
-	cartRepository := repository.NewCartRepositoryImpl()
 	cartService := service.NewCartService(cartRepository, userRepository, productRepository, db, validate)
 	cartController := controller.NewCartController(cartService)
 
@@ -56,11 +59,13 @@ func main() {
 	addressService := service.NewAddressService(addressRepository, userRepository, db, validate)
 	addressController := controller.NewAddressController(addressService)
 
-	orderRepository := repository.NewOrderRepositoryImpl()
-	orderService := service.NewOrderService(orderRepository, userRepository, cartRepository, db, validate)
+	orderItemsService := service.NewOrderItemsService(orderItemsRepository, userRepository, cartRepository, orderRepository, db, validate)
+	orderItemsController := controller.NewOrderItemsController(orderItemsService)
+
+	orderService := service.NewOrderService(orderRepository, userRepository, cartRepository, orderItemsRepository, db, validate)
 	orderController := controller.NewOrderController(orderService)
 
-	router := app.NewRouter(categoryController, productController, accountController, userController, cartController, addressController, orderController)
+	router := app.NewRouter(categoryController, productController, accountController, userController, cartController, addressController, orderController, orderItemsController)
 
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},

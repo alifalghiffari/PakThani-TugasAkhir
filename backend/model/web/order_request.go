@@ -1,7 +1,7 @@
 package web
 
 type OrderCreateRequest struct {
-	CartId []int `json:"cart"`
+	CartId int `json:"cart_id"`
 }
 
 type OrderUpdateRequest struct {
