@@ -75,87 +75,87 @@ func (service *OrderServiceImpl) FindAll(ctx context.Context) []web.OrderRespons
 // create order mengambil data total items, total price yang berasal dari order items yang dimana order items tersebut
 // buatkan order items setelah berhasil membuat order
 func (service *OrderServiceImpl) CreateOrder(ctx context.Context, request web.OrderCreateRequest, userId int) web.OrderResponse {
-    err := service.Validate.Struct(request)
-    if err != nil {
-        log.Printf("Validation error: %v", err)
-        helper.PanicIfError(err)
-    }
+	err := service.Validate.Struct(request)
+	if err != nil {
+		log.Printf("Validation error: %v", err)
+		helper.PanicIfError(err)
+	}
 
-    tx, err := service.DB.Begin()
-    helper.PanicIfError(err)
-    defer helper.CommitOrRollback(tx)
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
 
-    user, err := service.UserRepository.FindById(ctx, tx, userId)
-    if err != nil {
-        log.Printf("User not found error: %v", err)
-        panic(exception.NewNotFoundError(err.Error()))
-    }
+	user, err := service.UserRepository.FindById(ctx, tx, userId)
+	if err != nil {
+		log.Printf("User not found error: %v", err)
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
-    cart, err := service.CartRepository.FindByUserId(ctx, tx, userId)
-    if err != nil {
-        log.Printf("Cart not found error: %v", err)
-        panic(exception.NewNotFoundError(err.Error()))
-    }
+	cart, err := service.CartRepository.FindByUserId(ctx, tx, userId)
+	if err != nil {
+		log.Printf("Cart not found error: %v", err)
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
-    if len(cart) == 0 {
-        log.Println("Cart is empty")
-        panic(exception.NewNotFoundError("Cart is empty"))
-    }
+	if len(cart) == 0 {
+		log.Println("Cart is empty")
+		panic(exception.NewNotFoundError("Cart is empty"))
+	}
 
-    totalItems := 0
-    totalPrice := 0
-    for _, cartItem := range cart {
-        totalItems += cartItem.Quantity
-        totalPrice += cartItem.Quantity * cartItem.Price
-    }
+	totalItems := 0
+	totalPrice := 0
+	for _, cartItem := range cart {
+		totalItems += cartItem.Quantity
+		totalPrice += cartItem.Quantity * cartItem.Price
+	}
 
-    orderStatus := domain.Pending
+	orderStatus := domain.Pending
 	paymentStatus := domain.PaymentPending
 
-    order := domain.Order{
-        UserId:        user.Id,
-        TotalItems:    totalItems,
-        TotalPrice:    totalPrice,
-        OrderStatus:   orderStatus,
-        PaymentStatus: paymentStatus,
-    }
+	order := domain.Order{
+		UserId:        user.Id,
+		TotalItems:    totalItems,
+		TotalPrice:    totalPrice,
+		OrderStatus:   orderStatus,
+		PaymentStatus: paymentStatus,
+	}
 
-    // Insert order to get order ID
-    order = service.OrderRepository.Insert(ctx, tx, order)
-    if err != nil {
-        log.Printf("Order insert error: %v", err)
-        helper.PanicIfError(err)
-    }
+	// Insert order to get order ID
+	order = service.OrderRepository.Insert(ctx, tx, order)
+	if err != nil {
+		log.Printf("Order insert error: %v", err)
+		helper.PanicIfError(err)
+	}
 
-    var orderItems []domain.OrderItems
-    for _, cartItem := range cart {
-        orderItem := domain.OrderItems{
-            OrderId:   order.Id, // Ensure the correct OrderId is used
-            ProductId: cartItem.ProductId,
-            Quantity:  cartItem.Quantity,
-            Price:     cartItem.Price,
-        }
-        orderItems = append(orderItems, orderItem)
-    }
+	var orderItems []domain.OrderItems
+	for _, cartItem := range cart {
+		orderItem := domain.OrderItems{
+			OrderId:   order.Id, // Ensure the correct OrderId is used
+			ProductId: cartItem.ProductId,
+			Quantity:  cartItem.Quantity,
+			Price:     cartItem.Price,
+		}
+		orderItems = append(orderItems, orderItem)
+	}
 
-    for _, item := range orderItems {
-        service.OrderItemsRepository.Insert(ctx, tx, item)
-        if err != nil {
-            log.Printf("OrderItems insert error: %v", err)
-            helper.PanicIfError(err)
-        }
-    }
+	for _, item := range orderItems {
+		service.OrderItemsRepository.Insert(ctx, tx, item)
+		if err != nil {
+			log.Printf("OrderItems insert error: %v", err)
+			helper.PanicIfError(err)
+		}
+	}
 
-    // Clear the cart after order is created
-    for _, cartItem := range cart {
-        service.CartRepository.DeleteCart(ctx, tx, cartItem)
-        if err != nil {
-            log.Printf("Cart delete error: %v", err)
-            helper.PanicIfError(err)
-        }
-    }
+	// Clear the cart after order is created
+	for _, cartItem := range cart {
+		service.CartRepository.DeleteCart(ctx, tx, cartItem)
+		if err != nil {
+			log.Printf("Cart delete error: %v", err)
+			helper.PanicIfError(err)
+		}
+	}
 
-    return helper.ToOrderResponse(order)
+	return helper.ToOrderResponse(order)
 }
 
 func (service *OrderServiceImpl) UpdateOrder(ctx context.Context, request web.OrderUpdateRequest, Id int, userId int) web.OrderResponse {
@@ -191,16 +191,49 @@ func (service *OrderServiceImpl) UpdateOrder(ctx context.Context, request web.Or
 }
 
 func (service *OrderServiceImpl) FindOrderByUserId(ctx context.Context, userId int) []web.OrderResponse {
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
+    tx, err := service.DB.Begin()
+    helper.PanicIfError(err)
+    defer helper.CommitOrRollback(tx)
 
-	order, err := service.OrderRepository.FindByUserId(ctx, tx, userId)
-	if err != nil {
-		panic(exception.NewNotFoundError(err.Error()))
-	}
+    orders, err := service.OrderRepository.FindByUserId(ctx, tx, userId)
+    if err != nil {
+        panic(exception.NewNotFoundError(err.Error()))
+    }
 
-	return helper.ToOrderResponses(order)
+    var orderResponses []web.OrderResponse
+
+    for _, order := range orders {
+        orderItems, err := service.OrderItemsRepository.FindByOrderId(ctx, tx, order.Id)
+        if err != nil {
+            panic(exception.NewNotFoundError(err.Error()))
+        }
+
+        var orderItemsResponses []web.OrderItemsResponse
+        for _, orderItem := range orderItems {
+            orderItemsResponse := web.OrderItemsResponse{
+                Id:        orderItem.Id,
+                OrderId:   orderItem.OrderId,
+                ProductId: orderItem.ProductId,
+                Quantity:  orderItem.Quantity,
+                Price:     orderItem.Price,
+            }
+            orderItemsResponses = append(orderItemsResponses, orderItemsResponse)
+        }
+
+        orderResponse := web.OrderResponse{
+            Id:            order.Id,
+            UserId:        order.UserId,
+            TotalItems:    order.TotalItems,
+            TotalPrice:    order.TotalPrice,
+            OrderStatus:   string(order.OrderStatus),
+            PaymentStatus: string(order.PaymentStatus),
+            OrderItems:    orderItemsResponses,
+        }
+
+        orderResponses = append(orderResponses, orderResponse)
+    }
+
+    return orderResponses
 }
 
 func (service *OrderServiceImpl) FindOrderById(ctx context.Context, Id int, userId int) web.OrderResponse {

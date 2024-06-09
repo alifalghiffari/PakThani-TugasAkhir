@@ -60,7 +60,7 @@ func (repository *OrderRepositoryImpl) FindByUserId(ctx context.Context, tx *sql
 	for rows.Next() {
 		var order domain.Order
 		err := rows.Scan(
-			&order.Id, &order.UserId, &order.OrderStatus, &order.PaymentStatus,
+			&order.Id, &order.UserId, &order.TotalItems, &order.TotalPrice, &order.OrderStatus, &order.PaymentStatus,
 		)
 		helper.PanicIfError(err)
 		orders = append(orders, order)
