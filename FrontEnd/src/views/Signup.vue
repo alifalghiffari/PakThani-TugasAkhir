@@ -47,7 +47,7 @@
                     name="nohp"
                     id="nohp"
                     class="form-control w-100"
-                    v-model.number="nohp"
+                    v-model="nohp"
                     required
                   />
                 </div>
