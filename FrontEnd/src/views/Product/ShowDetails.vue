@@ -36,7 +36,7 @@
           </div>
         </div>
         <div class="pt-2">
-          <p>Stock: <b>{{ product.stock }}</b></p>
+          <p>Stock: <b>{{ product.quantity }}</b></p>
         </div>
 
         <div class="features pt-3">
@@ -116,6 +116,7 @@ export default {
     // },
     addToCart(productId) {
       productId = parseInt(productId, 10);
+      console.log(this.product);
 
       if (!this.token || this.quantity === 0) {
         swal({
@@ -123,7 +124,7 @@ export default {
           icon: "error",
         });
         return;
-      } else if (this.quantity > this.product.stock) {
+      } else if (this.quantity > this.product.quantity) {
         swal({
           text: "Product out of stock",
           icon: "error",

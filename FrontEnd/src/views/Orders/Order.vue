@@ -19,7 +19,7 @@
           </h6>
           <p class="mb-0">{{order.totalItems}} item<span v-if="order.totalItems > 1">s</span></p>
           <p id="item-price" class="mb-0 font-weight-bold">Total Cost : $ {{order.totalPrice}}</p>
-          <p id="item-username">Ordered By : {{order.username}}</p>
+          <!-- <p id="item-username">Ordered By : {{order.username}}</p> -->
           <p id="item-status">Status : {{ order.orderStatus }}</p>
         </div>
       </div>
@@ -58,11 +58,8 @@
                   totalPrice: order.total_price,
                   orderStatus: order.order_status,
                   paymentStatus: order.payment_status,
-                  userId: order.user_id, 
-                  username: order.user[0].username, 
               });
             });
-            console.log(orders);
           }
         }).catch((err) => {
             console.error(err);

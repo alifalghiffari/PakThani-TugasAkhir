@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"project-workshop/go-api-ecom/helper"
 	"project-workshop/go-api-ecom/model/domain"
 )
@@ -15,7 +16,7 @@ func NewCartRepositoryImpl() CartRepository {
 }
 
 func (repository *CartRepositoryImpl) AddToCart(ctx context.Context, tx *sql.Tx, cart domain.Cart) domain.Cart {
-	SQL := "INSERT INTO cart(userId, product_id, quantity) VALUES (?, ?, ?)"
+	SQL := "INSERT INTO cart(userId, product_id, quantity, price) VALUES (?, ?, ?, ?)"
 
 	var currentStock int
 	err := tx.QueryRowContext(ctx, "SELECT quantity FROM product WHERE id = ?", cart.ProductId).Scan(&currentStock)
@@ -31,7 +32,7 @@ func (repository *CartRepositoryImpl) AddToCart(ctx context.Context, tx *sql.Tx,
 	_, err = tx.ExecContext(ctx, SQL2, newStock, cart.ProductId)
 	helper.PanicIfError(err)
 
-	result, err := tx.ExecContext(ctx, SQL, cart.UserId, cart.ProductId, cart.Quantity)
+	result, err := tx.ExecContext(ctx, SQL, cart.UserId, cart.ProductId, cart.Quantity, cart.Price)
 	helper.PanicIfError(err)
 
 	id, err := result.LastInsertId()
@@ -55,11 +56,11 @@ func (repository *CartRepositoryImpl) RemoveCart(ctx context.Context, tx *sql.Tx
 	helper.PanicIfError(err)
 
 	var currentStock int
-	err = tx.QueryRowContext(ctx, "SELECT stock FROM product WHERE id = ?", cart.ProductId).Scan(&currentStock)
+	err = tx.QueryRowContext(ctx, "SELECT quantity FROM product WHERE id = ?", cart.ProductId).Scan(&currentStock)
 	helper.PanicIfError(err)
 
 	newStock := currentStock + cart.Quantity
-	SQL2 := "UPDATE product SET stock = ? WHERE id = ?"
+	SQL2 := "UPDATE product SET quantity = ? WHERE id = ?"
 	_, err = tx.ExecContext(ctx, SQL2, newStock, cart.ProductId)
 	helper.PanicIfError(err)
 
@@ -114,7 +115,7 @@ func (repository *CartRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.
     `
 	rows, err := tx.QueryContext(ctx, SQL, userId)
 	if err != nil {
-		return nil, err
+		fmt.Println("err", err)
 	}
 	defer rows.Close()
 

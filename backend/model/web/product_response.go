@@ -8,6 +8,6 @@ type ProductResponse struct {
 	Price       int    `json:"price"`
 	CategoryId  int    `json:"categoryId"`
 	Category    string `json:"category"`
-	Quantity    int    `json:"Quantity"`
+	Quantity    int    `json:"quantity"`
 	Slug        string `json:"slug"`
 }

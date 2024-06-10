@@ -29,15 +29,23 @@ func (repository *OrderItemsRepositoryImpl) FindById(ctx context.Context, tx *sq
 }
 
 func (repository *OrderItemsRepositoryImpl) FindByOrderId(ctx context.Context, tx *sql.Tx, orderId int) ([]domain.OrderItems, error) {
-	query := "SELECT id, order_id, product_id, quantity, price FROM order_items WHERE order_id = ?"
+	//query := "SELECT id, order_id, product_id, quantity, price FROM order_items WHERE order_id = ?"
+	query := `
+			SELECT o.id, o.order_id, o.product_id, o.quantity, o.price, p.id, p.name, p.image, p.price
+			FROM order_items o
+			JOIN product p ON o.product_id = p.id
+			WHERE o.order_id = ?
+	`
 	rows, err := tx.QueryContext(ctx, query, orderId)
 	helper.PanicIfError(err)
 
 	var orderItems []domain.OrderItems
 	for rows.Next() {
 		orderItem := domain.OrderItems{}
-		err = rows.Scan(&orderItem.Id, &orderItem.OrderId, &orderItem.ProductId, &orderItem.Quantity, &orderItem.Price)
+		product := domain.Product{}
+		err = rows.Scan(&orderItem.Id, &orderItem.OrderId, &orderItem.ProductId, &orderItem.Quantity, &orderItem.Price, &product.Id, &product.Name, &product.Image, &product.Price)
 		helper.PanicIfError(err)
+		orderItem.Product = append(orderItem.Product, product)
 		orderItems = append(orderItems, orderItem)
 	}
 

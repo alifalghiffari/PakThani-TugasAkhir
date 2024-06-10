@@ -51,7 +51,7 @@ func (service *CartServiceImpl) AddToCart(ctx context.Context, request web.CartC
 	}
 
 	if product.Quantity < request.Quantity {
-		panic(errors.New("Quantity is not enough"))
+		panic(errors.New("quantity is not enough"))
 	}
 
 	products := []domain.Product{product}

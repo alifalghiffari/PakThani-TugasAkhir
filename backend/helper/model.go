@@ -80,6 +80,7 @@ func ToOrderItemsResponse(orderItems domain.OrderItems) web.OrderItemsResponse {
 		ProductId: orderItems.ProductId,
 		Quantity:  orderItems.Quantity,
 		Price:     orderItems.Price,
+		Proudct:   ToProductResponses(orderItems.Product),
 	}
 }
 
