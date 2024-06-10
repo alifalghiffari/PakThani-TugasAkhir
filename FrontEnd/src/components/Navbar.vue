@@ -252,12 +252,14 @@ export default {
 }
 
 .search-results {
+  top:50px;
   margin-top: 10px;
-  position: relative;
-  background-color: #fff;
+  position: absolute;
+  background-color: #ffffff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   max-height: 300px;
   overflow-y: auto;
+  z-index: 2;
 }
 
 .search-results .list-group-item {
