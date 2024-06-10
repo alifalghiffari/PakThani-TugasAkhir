@@ -44,7 +44,7 @@
     name: 'Order',
     methods: {
       fecthOrder() {
-        axios.get(`${this.baseURL}api/order`, {
+        axios.get(`${this.baseURL}api/orders/users`, {
           headers: {
               Authorization: `Bearer ${this.token}`,
           },

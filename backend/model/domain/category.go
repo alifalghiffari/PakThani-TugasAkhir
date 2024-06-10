@@ -5,4 +5,5 @@ type Category struct {
 	Category string
 	Icon     string
 	Products []Product
+	Slug     string
 }

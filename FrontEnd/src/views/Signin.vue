@@ -15,11 +15,11 @@
           <h2 class="pt-4 pl-4">Sign-In</h2>
           <form @submit="signin" class="pt-4 pl-4 pr-4">
             <div class="form-group">
-              <label>Username</label>
+              <label>Email</label>
               <input
-                type="text"
+                type="email"
                 class="form-control"
-                v-model="username"
+                v-model="email"
                 required
               />
             </div>
@@ -70,7 +70,7 @@ export default {
   props: ["baseURL"],
   data() {
     return {
-      username: null,
+      email: null,
       password: null,
       loading: null,
     };
@@ -81,14 +81,20 @@ export default {
       this.loading = true;
 
       const user = {
-        username: this.username,
+        email: this.email,
         password: this.password,
       };
 
       await axios
         .post(`http://localhost:3000/api/users/login`, user)
         .then((res) => {
-          if(res.data.code === 200) {
+          if(res.data.code === 500) {
+            swal({
+              text: "Email or Password wrong",
+              icon: "error",
+              closeOnClickOutside: false,
+            });
+          }else if(res.data.code === 200) {
             localStorage.setItem("token", res.data.data.token);
             localStorage.setItem("user", res.data.data.role);
             this.$emit("fetchData");

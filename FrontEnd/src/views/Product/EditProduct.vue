@@ -9,11 +9,13 @@
     <div class="row">
       <div class="col-3"></div>
       <div class="col-md-6 px-5 px-md-0">
-        <form v-if="product">
+        <form @submit.prevent="editProduct" v-if="product">
           <div class="form-group">
             <label>Category</label>
             <select class="form-control" v-model="product.categoryId" required>
-              <option v-for="category of categories" :key="category.id" :value="category.id">{{category.categoryName}}</option>
+              <option v-for="category in categories" :value="category.id">
+                {{ category.category }}
+              </option>
             </select>
           </div>
           <div class="form-group">
@@ -26,13 +28,17 @@
           </div>
           <div class="form-group">
             <label>ImageURL</label>
-            <input type="url" class="form-control" v-model="product.imageURL" required>
+            <input type="url" class="form-control" v-model="product.image" required>
           </div>
           <div class="form-group">
             <label>Price</label>
-            <input type="number" class="form-control" v-model="product.price" required>
+            <input type="number" class="form-control" v-model.number="product.price" required>
           </div>
-          <button type="button" class="btn btn-primary" @click="editProduct">Submit</button>
+          <div class="form-group">
+            <label>Stock</label>
+            <input type="number" class="form-control" v-model.number="product.stock" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
         </form>
       </div>
       <div class="col-3"></div>
@@ -44,33 +50,78 @@
 export default {
   data(){
     return {
-      product: null
-    }
-  },
-  props : ["baseURL", "products", "categories"],
-  methods : {
-    async editProduct() {
-      axios.post(this.baseURL+"product/update/"+this.id, this.product)
-      .then(res => {
-        //sending the event to parent to handle
-        this.$emit("fetchData");
-        this.$router.push({name : 'AdminProduct'});
-        swal({
-          text: "Product Updated Successfully!",
-          icon: "success",
-          closeOnClickOutside: false,
-        });
-      })
-      .catch(err => console.log("err", err));
+      product: null,
+      categories: [],
+      token: localStorage.getItem('token'),
     }
   },
   mounted() {
-    if (!localStorage.getItem('token')) {
-      this.$router.push({name : 'Signin'});
-      return;
+    if (!this.token) {
+      this.$router.push({ name: 'Signin' });
+    } else {
+      this.id = this.$route.params.id;
+      this.product = this.products.find(product => product.id == this.id);
+      this.getCategories();
     }
-    this.id = this.$route.params.id;
-    this.product = this.products.find(product => product.id == this.id);
+  },
+  props : ["baseURL", "products"],
+  methods : {
+    getCategories() {
+      axios.get(`${this.baseURL}api/category`, {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      }).then((res) => {
+        if (res.data.code === 200) {
+          this.categories = res.data.data;
+          this.$nextTick(() => {
+            const category = this.categories.find(c => c.id === this.product.categoryId);
+            this.product.categoryId = category ? category.id : null;
+          });
+        }
+      }).catch(err => {
+        console.error(err);
+      });
+    },
+    editProduct() {
+      const slug = this.generateSlug(this.product.name);
+
+      const editProduct = {
+        id: this.product.id,
+        category_id: this.product.categoryId,
+        name: this.product.name,
+        description: this.product.description,
+        image: this.product.image,
+        price: this.product.price,
+        stock: this.product.stock,
+        slug: slug,
+      };
+
+      console.log(editProduct);
+      
+      axios.put(`${this.baseURL}/api/products/${this.product.id}`, editProduct, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      }).then((res) => {
+        if (res.data.code === 200) {
+          swal({
+            text: "Product Edit Successfully!",
+            icon: "success",
+            closeOnClickOutside: false,
+          });
+          this.$emit("fetchData");
+          this.$router.push({ name: 'AdminProduct' });
+        }
+      }).catch(err => {
+        console.error(err);
+      });
+    },
+    generateSlug(name) {
+      // Remove special characters and replace spaces with hyphens
+      const slug = name.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/ /g, '-');
+      return slug;
+    },
   }
 }
 </script>

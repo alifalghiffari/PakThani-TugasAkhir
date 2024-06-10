@@ -36,6 +36,8 @@ func (service *CategoryServiceImpl) Create(ctx context.Context, request web.Cate
 
 	category := domain.Category{
 		Category: request.Category,
+		Icon:     request.Icon,
+		Slug:     request.Slug,
 	}
 
 	category = service.CategoryRepository.Save(ctx, tx, category)
@@ -57,6 +59,8 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request web.Cate
 	}
 
 	category.Category = request.Category
+	category.Icon = request.Icon
+	category.Slug = request.Slug
 
 	category = service.CategoryRepository.Update(ctx, tx, category)
 
@@ -95,6 +99,16 @@ func (service *CategoryServiceImpl) FindAll(ctx context.Context) []web.CategoryR
 	defer helper.CommitOrRollback(tx)
 
 	categories := service.CategoryRepository.FindAll(ctx, tx)
+
+	return helper.ToCategoryResponses(categories)
+}
+
+func (service *CategoryServiceImpl) GetAll(ctx context.Context) []web.CategoryResponse {
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	categories := service.CategoryRepository.GetAll(ctx, tx)
 
 	return helper.ToCategoryResponses(categories)
 }

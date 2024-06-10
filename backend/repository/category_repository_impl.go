@@ -15,8 +15,8 @@ func NewCategoryRepository() CategoryRepository {
 }
 
 func (repository *CategoryRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, category domain.Category) domain.Category {
-	SQL := "insert into category(category) values (?)"
-	result, err := tx.ExecContext(ctx, SQL, category.Category)
+	SQL := "insert into category(category, icon, slug) values (?, ?, ?)"
+	result, err := tx.ExecContext(ctx, SQL, category.Category, category.Icon, category.Slug)
 	helper.PanicIfError(err)
 
 	id, err := result.LastInsertId()
@@ -27,8 +27,8 @@ func (repository *CategoryRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, 
 }
 
 func (repository *CategoryRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, category domain.Category) domain.Category {
-	SQL := "update category set category = ? where id = ?"
-	_, err := tx.ExecContext(ctx, SQL, category.Category, category.Id)
+	SQL := "update category set category = ?, icon = ?, slug = ? where id = ?"
+	_, err := tx.ExecContext(ctx, SQL, category.Category, category.Icon, category.Slug, category.Id)
 	helper.PanicIfError(err)
 
 	return category
@@ -88,6 +88,23 @@ func (repository *CategoryRepositoryImpl) FindAll(ctx context.Context, tx *sql.T
 	var categories []domain.Category
 	for _, category := range categoriesMap {
 		categories = append(categories, *category)
+	}
+
+	return categories
+}
+
+func (repository *CategoryRepositoryImpl) GetAll(ctx context.Context, tx *sql.Tx) []domain.Category {
+	SQL := "SELECT id, category FROM category"
+	rows, err := tx.QueryContext(ctx, SQL)
+	helper.PanicIfError(err)
+	defer rows.Close()
+
+	var categories []domain.Category
+	for rows.Next() {
+		category := domain.Category{}
+		err := rows.Scan(&category.Id, &category.Category)
+		helper.PanicIfError(err)
+		categories = append(categories, category)
 	}
 
 	return categories

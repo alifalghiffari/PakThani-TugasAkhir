@@ -23,12 +23,14 @@
       <form class="form-inline ml-auto mr-auto">
         <div class="input-group">
           <input
-            size="100"
+            size="95"
             type="text"
             class="form-control"
             placeholder="Search Items"
             aria-label="Username"
             aria-describedby="basic-addon1"
+            v-model="searchQuery"
+            @keyup="searchProduct(searchQuery)"
           />
           <div class="input-group-prepend">
             <span class="input-group-text" id="search-button-navbar">
@@ -47,7 +49,15 @@
             </span>
           </div>
         </div>
+        <div v-if="filteredProducts && filteredProducts.length > 0" class="search-results">
+          <ul class="list-group">
+            <li class="list-group-item" v-for="item in filteredProducts" :key="item.id">
+              <router-link :to="{ name: 'ShowDetails', params: { id: item.id } }">{{ item.name }}</router-link>
+            </li>
+          </ul>
+        </div>
       </form>
+      
 
       <!--      DropDowns-->
       <ul class="navbar-nav ml-auto">
@@ -119,11 +129,11 @@
           </div>
         </li>
 
-        <!-- <li class="nav-item">
+        <li class="nav-item">
           <router-link class="nav-link text-light" :to="{ name: 'Order' }"
             >Orders</router-link
           >
-        </li> -->
+        </li>
         <li class="nav-item">
           <div id="cart">
             <!-- <span id="nav-cart-count">{{ cartCount }}</span> -->
@@ -138,12 +148,18 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: "Navbar",
   props: ["cartCount"],
   data() {
     return {
       token: null,
+      products: [],
+      filteredProducts: [],
+      searchQuery: '',
+      isLoading: false
     };
   },
   methods: {
@@ -158,6 +174,35 @@ export default {
         closeOnClickOutside: false,
       });
     },
+    getProduct() {
+      this.isLoading = true;
+      axios.get(`http://localhost:3000/api/products`)
+        .then((res) => {
+          if (res.data.code === 200) {
+            this.products = res.data.data;
+          }
+        })
+        .catch(err => {
+          console.error(err);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    searchProduct(query) {
+      this.searchQuery = query;
+      if (query.trim() === '') {
+        this.filteredProducts = [];
+      } else {
+        if (this.products && this.products.length > 0) {
+          this.filteredProducts = this.products.filter(product =>
+            product.name.toLowerCase().includes(query.toLowerCase())
+          );
+        } else {
+          this.filteredProducts = [];
+        }
+      }
+    },
   },
   computed: {
     isAdmin() {
@@ -166,6 +211,7 @@ export default {
     }
   },
   mounted() {
+    this.getProduct();
     this.token = localStorage.getItem("token");
   },
 };
@@ -203,5 +249,29 @@ export default {
 }
 #cart {
   position: relative;
+}
+
+.search-results {
+  margin-top: 10px;
+  position: relative;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.search-results .list-group-item {
+  border: none;
+}
+
+.search-results .list-group-item a {
+  display: block;
+  padding: 8px 16px;
+  color: #333;
+  text-decoration: none;
+}
+
+.search-results .list-group-item a:hover {
+  background-color: #f5f5f5;
 }
 </style>

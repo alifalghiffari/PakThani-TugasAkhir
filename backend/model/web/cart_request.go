@@ -16,5 +16,7 @@ type CartUpdateRequest struct {
 }
 
 type CartDeleteRequest struct {
-	Id int `json:"id"`
+	Id        int `json:"id"`
+	ProductId int `json:"product_id"`
+	Quantity  int `json:"quantity"`
 }

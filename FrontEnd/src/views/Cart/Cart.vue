@@ -49,7 +49,7 @@
              {{ cartItem.product[0].price * cartItem.quantity }}</span
             >
           </p>
-          <br /><a href="#" class="text-right" @click="deleteItem(cartItem.id)"
+          <br /><a href="#" class="text-right" @click="deleteItem(cartItem.id, cartItem.product[0].id, cartItem.quantity)"
             >Remove From Cart</a>
         </div>
       </div>
@@ -64,7 +64,7 @@
         
         type="button"
         class="btn btn-primary confirm"
-        @click="checkout"
+        @click="checkout()"
       >
         Confirm Order
       </button>
@@ -132,6 +132,7 @@ export default {
       })
     },
     checkout() {
+      
       swal({
         title: "Confirm Order",
         text: "Are you sure you want to place this order?",
@@ -144,7 +145,7 @@ export default {
           } else {
             swal({
               title: "Confirm Address",
-              text: `This is your address: \n${this.address.kabupaten} \n${this.address.kecamatan} \n${this.address.kelurahan} \n${this.address.alamat}\n\nIf you want to change the address, please click Update.`,
+              text: `This is your address: \n${this.address.nama_penerima} \n${this.address.kabupaten} \n${this.address.kecamatan} \n${this.address.kelurahan} \n${this.address.alamat}\n\nIf you want to change the address, please click Update.`,
               icon: "warning",
               buttons: {
                 cancel: "Cancel",
@@ -176,19 +177,22 @@ export default {
           }
         }
       });
+      
     },
-    deleteItem(itemId) {
+    deleteItem(itemId, productId, quantityItem) {
       itemId = parseInt(itemId, 10);
       const config = {
         headers: {
           Authorization: `Bearer ${this.token}`
         },
         data: {
-          id: itemId
+          id: itemId,
+          product_id: productId,
+          quantity: quantityItem
         }
       };
       axios
-        .delete(`${this.baseURL}api/carts/${itemId}`, config)
+        .delete(`${this.baseURL}api/remove/carts`, config)
         .then((response) => {
           if (response.data.code === 200) {
             swal({
@@ -221,7 +225,7 @@ export default {
     this.token = localStorage.getItem('token');
     this.listCartItems();
     this.fetchAddress();
-    this.checkout();
+    //this.checkout();
   },
 };
 </script>

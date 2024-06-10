@@ -12,6 +12,7 @@ func ToCategoryResponse(category domain.Category) web.CategoryResponse {
 		Category: category.Category,
 		Icon:     category.Icon,
 		Products: ToProductResponses(category.Products),
+		Slug:     category.Slug,
 	}
 }
 
@@ -53,9 +54,10 @@ func ToProductResponse(product domain.Product) web.ProductResponse {
 		Image:       product.Image,
 		Description: product.Description,
 		Price:       product.Price,
-		Quantity:    product.Quantity,
 		CategoryId:  product.CategoryId,
 		Category:    product.Category.Category,
+		Quantity:    product.Quantity,
+		Slug:        product.Slug,
 	}
 }
 

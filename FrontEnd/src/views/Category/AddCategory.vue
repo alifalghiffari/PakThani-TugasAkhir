@@ -15,10 +15,6 @@
             <input type="text" class="form-control" v-model="categoryName" required>
           </div>
           <div class="form-group">
-            <label>Description</label>
-            <input type="text" class="form-control" v-model="description" required>
-          </div>
-          <div class="form-group">
             <label>ImageURL</label>
             <input type="url" class="form-control" v-model="imageURL" required>
           </div>
@@ -31,47 +27,54 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data(){
     return {
       categoryName : null,
-      description : null,
       imageURL : null,
+      token: localStorage.getItem('token'),
     }
   },
   props : ["baseURL", "categories"],
   methods : {
-    async addCategory() {
+    addCategory() {
+      const slug = this.generateSlug(this.categoryName);
+
       const newCategory = {
-        categoryName : this.categoryName,
-        description : this.description,
-        imageUrl : this.imageURL,
+        category: this.categoryName,
+        image: this.imageURL,
+        slug: slug,
       }
 
-      await axios({
-        method: 'post',
-        url: this.baseURL+"category/create",
-        data : JSON.stringify(newCategory),
+      axios.post(`${this.baseURL}api/categories`, newCategory, {
         headers: {
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${this.token}`,
+        },
+      }).then((res) => {
+        if (res.data.code === 200) {
+          swal({
+            text: "Product Added Successfully!",
+            icon: "success",
+            closeOnClickOutside: false,
+          });
+          this.$emit("fetchData");
+          this.$router.push({ name: 'AdminCategory' });
         }
-      })
-      .then(res => {
-        //sending the event to parent to handle
-        this.$emit("fetchData");
-        this.$router.push({name:'AdminCategory'});
-        swal({
-          text: "Category Added Successfully!",
-          icon: "success",
-          closeOnClickOutside: false,
-        });
-      })
-      .catch(err => console.log(err));
-    }
+      }).catch(err => {
+        console.error(err);
+      });
+    },
+    generateSlug(name) {
+      // Remove special characters and replace spaces with hyphens
+      const slug = name.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/ /g, '-');
+      return slug;
+    },
   },
   mounted(){
-    if (!localStorage.getItem('token')) {
-      this.$router.push({name : 'Signin'});
+    if (!this.token) {
+      this.$router.push({ name: 'Signin' });
     }
   }
 }
