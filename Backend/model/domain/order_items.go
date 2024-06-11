@@ -7,5 +7,5 @@ type OrderItems struct {
 	ProductId int // ID produk yang dibeli
 	Quantity  int // Jumlah produk yang dibeli
 	Price     int // Harga produk per item
-	Product   []Product
+	Product   Product
 }

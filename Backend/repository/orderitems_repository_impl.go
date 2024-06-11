@@ -42,10 +42,8 @@ func (repository *OrderItemsRepositoryImpl) FindByOrderId(ctx context.Context, t
 	var orderItems []domain.OrderItems
 	for rows.Next() {
 		orderItem := domain.OrderItems{}
-		product := domain.Product{}
-		err = rows.Scan(&orderItem.Id, &orderItem.OrderId, &orderItem.ProductId, &orderItem.Quantity, &orderItem.Price, &product.Id, &product.Name, &product.Image, &product.Price)
+		err = rows.Scan(&orderItem.Id, &orderItem.OrderId, &orderItem.ProductId, &orderItem.Quantity, &orderItem.Price, &orderItem.Product.Id, &orderItem.Product.Name, &orderItem.Product.Image, &orderItem.Product.Price)
 		helper.PanicIfError(err)
-		orderItem.Product = append(orderItem.Product, product)
 		orderItems = append(orderItems, orderItem)
 	}
 
