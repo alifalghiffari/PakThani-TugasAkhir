@@ -37,9 +37,11 @@ func (service *ProductServiceImpl) Create(ctx context.Context, request web.Produ
 	product := domain.Product{
 		Name:        request.Name,
 		Description: request.Description,
+		Image:       request.Image,
 		Price:       request.Price,
-		Quantity:    request.Quantity,
 		CategoryId:  request.CategoryId,
+		Quantity:    request.Quantity,
+		Slug:        request.Slug,
 	}
 
 	product = service.ProductRepository.Save(ctx, tx, product)
@@ -62,9 +64,11 @@ func (service *ProductServiceImpl) Update(ctx context.Context, request web.Produ
 
 	product.Name = request.Name
 	product.Description = request.Description
+	product.Image = request.Image
 	product.Price = request.Price
-	product.Quantity = request.Quantity
 	product.CategoryId = request.CategoryId
+	product.Quantity = request.Quantity
+	product.Slug = request.Slug
 
 	product = service.ProductRepository.Update(ctx, tx, product)
 

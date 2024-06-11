@@ -14,11 +14,13 @@
         </p>
 
         <div class="d-flex flex-row justify-content-between">
-          <div class="input-group col-md-3 col-4 p-0">
-            <div class="input-group-prepend">
-              <span class="input-group-text" id="basic-addon1">Quantity</span>
+          <div class="quantity-container ">
+            <span class="quantity-label">Quantity</span>
+            <div class="quantity-input-container">
+              <button class="quantity-btn" @click="decrementQuantity" :disabled="quantity <= 1">-</button>
+              <input class="form-control num text-center" type="number" v-model.number="quantity" min="1" />
+              <button class="quantity-btn" @click="incrementQuantity">+</button>
             </div>
-            <input class="form-control" type="number" v-model.number="quantity" />
           </div>
 
           <div class="input-group col-md-3 col-4 p-0">
@@ -32,6 +34,9 @@
               <ion-icon name="cart-outline" v-pre></ion-icon>
             </button>
           </div>
+        </div>
+        <div class="pt-2">
+          <p>Stock: <b>{{ product.quantity }}</b></p>
         </div>
 
         <div class="features pt-3">
@@ -84,6 +89,14 @@ export default {
   },
   props: ["baseURL", "products", "category"],
   methods: {
+    incrementQuantity() {
+      this.quantity++
+    },
+    decrementQuantity() {
+      if (this.quantity > 1) {
+        this.quantity--
+      }
+    },
     // addToWishList(productId) {
     //   axios
     //     .post(`${this.baseURL}wishlist/add?token=${this.token}`, {
@@ -103,10 +116,17 @@ export default {
     // },
     addToCart(productId) {
       productId = parseInt(productId, 10);
+      console.log(this.product);
 
       if (!this.token || this.quantity === 0) {
         swal({
           text: "Please log in first! or check your quantity",
+          icon: "error",
+        });
+        return;
+      } else if (this.quantity > this.product.quantity) {
+        swal({
+          text: "Product out of stock",
           icon: "error",
         });
         return;
@@ -191,5 +211,38 @@ input[type="number"] {
   background-color: #131921;
   color: white;
   border-radius: 0;
+}
+
+.quantity-container {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-label {
+  margin-right: 10px;
+}
+
+.quantity-input-container {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-btn {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+.quantity-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.num {
+  width: 80px;
+  text-align: center;
+  padding: 5px;
+  border: 1px solid #ccc;
 }
 </style>

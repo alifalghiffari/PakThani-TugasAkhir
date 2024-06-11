@@ -9,11 +9,13 @@
     <div class="row">
       <div class="col-3"></div>
       <div class="col-md-6 px-5 px-md-0">
-        <form>
+        <form @submit.prevent="addProduct">
           <div class="form-group">
             <label>Category</label>
-            <select class="form-control" v-model="categoryId" required>
-              <option v-for="category of categories" :key="category.id" :value="category.id">{{category.categoryName}}</option>
+            <select class="form-control" v-model.number="categoryId" required>
+              <option v-for="category in categories" :value="category.id">
+                {{ category.category }}
+              </option>
             </select>
           </div>
           <div class="form-group">
@@ -26,13 +28,17 @@
           </div>
           <div class="form-group">
             <label>ImageURL</label>
-            <input type="url" class="form-control" v-model="imageURL" required>
+            <input type="text" class="form-control" v-model="imageURL" required>
           </div>
           <div class="form-group">
             <label>Price</label>
-            <input type="number" class="form-control" v-model="price" required>
+            <input type="number" class="form-control" v-model.number="price" required>
           </div>
-          <button type="button" class="btn btn-primary" @click="addProduct">Submit</button>
+          <div class="form-group">
+            <label>Stock</label>
+            <input type="number" class="form-control" v-model.number="stock" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
         </form>
       </div>
       <div class="col-3"></div>
@@ -41,53 +47,78 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data(){
     return {
-      id : null,
-      categoryId : null,
-      name : null,
-      description : null,
-      imageURL : null,
-      price : null
+      categoryId: null,
+      name: null,
+      description: null,
+      imageURL: null,
+      price: null,
+      stock: null,
+      categories: [],
+      token: localStorage.getItem('token'),
     }
   },
-  props : ["baseURL", "products", "categories"],
+  props : ["baseURL"],
   methods : {
-    async addProduct() {
-      const newProduct = {
-        id : this.id,
-        categoryId : this.categoryId,
-        name : this.name,
-        description : this.description,
-        imageURL : this.imageURL,
-        price : this.price
-      }
-
-      await axios({
-        method: 'post',
-        url: this.baseURL+"product/add",
-        data : JSON.stringify(newProduct),
+    getCategories() {
+      axios.get(`${this.baseURL}api/category`, {
         headers: {
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${this.token}`
         }
-      })
-      .then(res => {
-        //sending the event to parent to handle
-        this.$emit("fetchData");
-        this.$router.push({name : 'AdminProduct'});
-        swal({
-          text: "Product Added Successfully!",
-          icon: "success",
-          closeOnClickOutside: false,
-        });
-      })
-      .catch(err => console.log(err));
-    }
+      }).then((res) => {
+        if (res.data.code === 200) {
+          this.categories = res.data.data;
+        }
+      }).catch(err => {
+        console.error(err);
+      });
+    },
+    addProduct() {
+      const slug = this.generateSlug(this.name);
+
+      const newProduct = {
+        category_id: this.categoryId,
+        name: this.name,
+        description: this.description,
+        image: this.imageURL,
+        price: this.price,
+        stock: this.stock,
+        slug: slug,
+      };
+
+      axios.post(`${this.baseURL}api/products`, newProduct, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      }).then((res) => {
+        if (res.data.code === 200) {
+          swal({
+            text: "Product Added Successfully!",
+            icon: "success",
+            closeOnClickOutside: false,
+          });
+          this.$emit("fetchData");
+          this.$router.push({ name: 'AdminProduct' });
+        }
+      }).catch(err => {
+        console.error(err);
+      });
+    },
+    generateSlug(name) {
+      // Remove special characters and replace spaces with hyphens
+      const slug = name.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/ /g, '-');
+      return slug;
+    },
   },
   mounted() {
-    if (!localStorage.getItem('token')) {
-      this.$router.push({name : 'Signin'});
+    if (!this.token) {
+      this.$router.push({ name: 'Signin' });
+    } else {
+      this.getCategories();
     }
   }
 }

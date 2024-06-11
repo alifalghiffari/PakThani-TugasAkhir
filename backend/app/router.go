@@ -38,6 +38,7 @@ func NewRouter(categoryController controller.CategoryController,
 	// Keranjang
 	router.POST("/api/carts", authMiddleware.ApplyMiddleware(cartController.AddToCart))
 	router.PUT("/api/carts", authMiddleware.ApplyMiddleware(cartController.UpdateCart))
+	router.DELETE("/api/remove/carts", authMiddleware.ApplyMiddleware(cartController.RemoveCart))
 	router.DELETE("/api/carts", authMiddleware.ApplyMiddleware(cartController.DeleteCart))
 	router.GET("/api/carts/edit", authMiddleware.ApplyMiddleware(cartController.FindById))
 	router.GET("/api/carts/users", authMiddleware.ApplyMiddleware(cartController.FindByUserId))
@@ -45,6 +46,7 @@ func NewRouter(categoryController controller.CategoryController,
 
 	// Kategori
 	router.GET("/api/categories", categoryController.FindAll)
+	router.GET("/api/category", authMiddleware.ApplyAdminMiddleware(categoryController.GetAll))
 	router.GET("/api/categories/:categoryId", categoryController.FindById)
 	router.POST("/api/categories", authMiddleware.ApplyAdminMiddleware(categoryController.Create))
 	router.PUT("/api/categories/:categoryId", authMiddleware.ApplyAdminMiddleware(categoryController.Update))

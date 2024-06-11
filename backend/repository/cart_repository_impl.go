@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"project-workshop/go-api-ecom/helper"
 	"project-workshop/go-api-ecom/model/domain"
 )
@@ -15,20 +16,52 @@ func NewCartRepositoryImpl() CartRepository {
 }
 
 func (repository *CartRepositoryImpl) AddToCart(ctx context.Context, tx *sql.Tx, cart domain.Cart) domain.Cart {
-	SQL := "insert into cart(userId, product_id, quantity, price) values (?, ?, ?, ?)"
+	SQL := "INSERT INTO cart(userId, product_id, quantity, price) VALUES (?, ?, ?, ?)"
+
+	var currentStock int
+	err := tx.QueryRowContext(ctx, "SELECT quantity FROM product WHERE id = ?", cart.ProductId).Scan(&currentStock)
+	helper.PanicIfError(err)
+
+	newStock := currentStock - cart.Quantity
+
+	if newStock < 0 {
+		panic("Ouf of Stock")
+	}
+
+	SQL2 := "UPDATE product SET quantity = ? WHERE id = ?"
+	_, err = tx.ExecContext(ctx, SQL2, newStock, cart.ProductId)
+	helper.PanicIfError(err)
+
 	result, err := tx.ExecContext(ctx, SQL, cart.UserId, cart.ProductId, cart.Quantity, cart.Price)
 	helper.PanicIfError(err)
 
 	id, err := result.LastInsertId()
 	helper.PanicIfError(err)
-
 	cart.Id = int(id)
+
 	return cart
 }
 
 func (repository *CartRepositoryImpl) UpdateCart(ctx context.Context, tx *sql.Tx, cart domain.Cart) domain.Cart {
 	SQL := "update cart set quantity = ? where id = ?"
 	_, err := tx.ExecContext(ctx, SQL, cart.Quantity, cart.Id)
+	helper.PanicIfError(err)
+
+	return cart
+}
+
+func (repository *CartRepositoryImpl) RemoveCart(ctx context.Context, tx *sql.Tx, cart domain.Cart) domain.Cart {
+	SQL := "DELETE FROM cart WHERE id = ?"
+	_, err := tx.ExecContext(ctx, SQL, cart.Id)
+	helper.PanicIfError(err)
+
+	var currentStock int
+	err = tx.QueryRowContext(ctx, "SELECT quantity FROM product WHERE id = ?", cart.ProductId).Scan(&currentStock)
+	helper.PanicIfError(err)
+
+	newStock := currentStock + cart.Quantity
+	SQL2 := "UPDATE product SET quantity = ? WHERE id = ?"
+	_, err = tx.ExecContext(ctx, SQL2, newStock, cart.ProductId)
 	helper.PanicIfError(err)
 
 	return cart
@@ -82,7 +115,7 @@ func (repository *CartRepositoryImpl) FindByUserId(ctx context.Context, tx *sql.
     `
 	rows, err := tx.QueryContext(ctx, SQL, userId)
 	if err != nil {
-		return nil, err
+		fmt.Println("err", err)
 	}
 	defer rows.Close()
 

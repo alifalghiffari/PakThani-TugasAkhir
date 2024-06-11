@@ -31,19 +31,6 @@
                   <label>Name</label>
                   <input
                     type="name"
-                    name="name"
-                    id="name"
-                    class="form-control"
-                    v-model="firstName"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="col">
-                <div class="form-group">
-                  <label>Username</label>
-                  <input
-                    type="name"
                     name="username"
                     id="username"
                     class="form-control"
@@ -52,16 +39,20 @@
                   />
                 </div>
               </div>
+              <div class="col">
+                <div class="form-group">
+                  <label>No HP</label>
+                  <input
+                    type="number"
+                    name="nohp"
+                    id="nohp"
+                    class="form-control w-100"
+                    v-model="nohp"
+                    required
+                  />
+                </div>
+              </div>
             </div>
-            <!-- <div class="form-group">
-              <label>No HP</label>
-              <input
-                type="number"
-                class="form-control"
-                v-model="nohp"
-                required
-              />
-            </div> -->
             <div class="form-group">
               <label>Password</label>
               <input
@@ -71,7 +62,11 @@
                 class="form-control"
                 v-model="password"
                 required
+                :class="{ 'is-invalid': password && !passwordRegex.test(password) }"
               />
+              <div class="invalid-feedback" v-if="password && !passwordRegex.test(password)">
+                Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.
+              </div>
             </div>
             <div class="form-group">
               <label>Confirm Password</label>
@@ -82,17 +77,16 @@
                 required
               />
             </div>
-            <div class="form-group">
+            <!-- <div class="form-group">
               <input 
               type="text"
               name="role"
               id="role"
-              value=""
               class="form-control"
               
               hidden
               />
-            </div>
+            </div> -->
             <button type="submit" class="btn btn-primary mt-2 py-0">
               Create Account
             </button>
@@ -115,61 +109,62 @@
 </template>
 
 <script>
-export default {
-  name: "Signup",
-  props: ["baseURL"],
-  data() {
-    return {
-      email: null,
-      //name: null,
-      username: null,
-      password: null,
-      passwordConfirm: null,
-      role: true,
-    };
-  },
-  methods: {
-    async signup(e) {
-      e.preventDefault();
-      // if the password matches
-      if (this.password === this.passwordConfirm) {
-        // make the post body
-        const user = {
-          email: this.email,
-          //name: this.name,
-          username: this.username,
-          password: this.password,
-          role: this.role,
-        };
-        console.log(user);
-
-        // call the API
-        await axios
-          .post(`http://localhost:3000/api/users/register`, user)
-          .then((res) => {
-            console.log(res);
-            // redirect to home page
-            this.$router.replace("/");
-            swal({
-              text: "User signup successful. Please Login",
-              icon: "success",
-              closeOnClickOutside: false,
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      } else {
-        // passwords are not matching
-        swal({
-          text: "Error! Passwords are not matching",
-          icon: "error",
-          closeOnClickOutside: false,
-        });
-      }
+  export default {
+    name: "Signup",
+    props: ["baseURL"],
+    data() {
+      return {
+        email: null,
+        username: null,
+        nohp: null,
+        password: null,
+        passwordConfirm: null,
+        role: true,
+        passwordRegex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+      };
     },
-  },
-};
+    methods: {
+      async signup(e) {
+        e.preventDefault();
+        // if the password matches and meets the requirements
+        if (this.password === this.passwordConfirm && this.passwordRegex.test(this.password)) {
+          // make the post body
+          const user = {
+            email: this.email,
+            username: this.username,
+            no_telepon: this.nohp,
+            password: this.password,
+            role: this.role,
+          };
+          console.log(user);
+
+          // call the API
+          await axios
+            .post(`http://localhost:3000/api/users/register`, user)
+            .then((res) => {
+              console.log(res);
+              // redirect to home page
+              this.$router.replace("/signin");
+              swal({
+                text: "User signup successful. Please Login",
+                icon: "success",
+                closeOnClickOutside: false,
+              });
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        } else {
+          // passwords are not matching or do not meet the requirements
+          swal({
+            text: "Error! Passwords are not matching or do not meet the requirements",
+            icon: "error",
+            closeOnClickOutside: false,
+          });
+        }
+      },
+    },
+  };
 </script>
 
 <style scoped>
@@ -197,4 +192,5 @@ export default {
     width: 40%;
   }
 }
+
 </style>

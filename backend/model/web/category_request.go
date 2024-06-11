@@ -1,12 +1,16 @@
 package web
 
 type CategoryCreateRequest struct {
-	Category string `validate:"required,min=1,max=100" json:"name"`
+	Category string `json:"category" validate:"required,min=1,max=100"`
+	Icon     string `json:"image" validate:"required"`
+	Slug     string `json:"slug" validate:"required"`
 }
 
 type CategoryUpdateRequest struct {
-	Id       int    `validate:"required"`
-	Category string `validate:"required,max=200,min=1" json:"name"`
+	Id       int    `json:"id" validate:"required"`
+	Category string `json:"category" validate:"required,min=1,max=100"`
+	Icon     string `json:"image" validate:"required"`
+	Slug     string `json:"slug" validate:"required"`
 }
 
 type CategoryDeleteRequest struct {

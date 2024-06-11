@@ -50,6 +50,21 @@ func (controller *CartControllerImpl) UpdateCart(writer http.ResponseWriter, req
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
+func (controller *CartControllerImpl) RemoveCart(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	cartDeleteRequest := web.CartDeleteRequest{}
+	userId := request.Context().Value("userId").(int)
+	helper.ReadFromRequestBody(request, &cartDeleteRequest)
+
+	cartResponse := controller.CartService.RemoveCart(request.Context(), cartDeleteRequest, userId)
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   cartResponse,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}
+
 func (controller *CartControllerImpl) DeleteCart(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	cartDeleteRequest := web.CartDeleteRequest{}
 	userId := request.Context().Value("userId").(int)

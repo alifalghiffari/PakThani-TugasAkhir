@@ -51,7 +51,7 @@ func (service *CartServiceImpl) AddToCart(ctx context.Context, request web.CartC
 	}
 
 	if product.Quantity < request.Quantity {
-		panic(errors.New("Stock is not enough"))
+		panic(errors.New("quantity is not enough"))
 	}
 
 	products := []domain.Product{product}
@@ -101,6 +101,30 @@ func (service *CartServiceImpl) UpdateCart(ctx context.Context, request web.Cart
 	return helper.ToCartResponse(cart)
 }
 
+func (service *CartServiceImpl) RemoveCart(ctx context.Context, request web.CartDeleteRequest, userId int) web.CartResponse {
+	err := service.Validate.Struct(request)
+	helper.PanicIfError(err)
+
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	user, err := service.UserRepository.FindById(ctx, tx, userId)
+	if err != nil {
+		panic(err)
+	}
+
+	cart := domain.Cart{
+		Id:        request.Id,
+		UserId:    user.Id,
+		ProductId: request.ProductId,
+		Quantity:  request.Quantity,
+	}
+	cart = service.CartRepository.RemoveCart(ctx, tx, cart)
+
+	return helper.ToCartResponse(cart)
+}
+
 func (service *CartServiceImpl) DeleteCart(ctx context.Context, request web.CartDeleteRequest, userId int) web.CartResponse {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
@@ -136,16 +160,16 @@ func (service *CartServiceImpl) FindById(ctx context.Context, cartId []int) web.
 	}
 
 	var cartResponses []web.CartResponse
-    for _, carts := range cart {
-        cartResponse := web.CartResponse{
-            Id:        carts.Id,
-            ProductId: carts.ProductId,
-            Quantity:  carts.Quantity,
-            Price:     carts.Price,
-        }
-        cartResponses = append(cartResponses, cartResponse)
-    }
-    return cartResponses[0]
+	for _, carts := range cart {
+		cartResponse := web.CartResponse{
+			Id:        carts.Id,
+			ProductId: carts.ProductId,
+			Quantity:  carts.Quantity,
+			Price:     carts.Price,
+		}
+		cartResponses = append(cartResponses, cartResponse)
+	}
+	return cartResponses[0]
 }
 
 func (service *CartServiceImpl) FindByUserId(ctx context.Context, userId int) []web.CartResponse {

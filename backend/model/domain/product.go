@@ -6,7 +6,8 @@ type Product struct {
 	Image       string
 	Description string
 	Price       int
-	Quantity    int
 	CategoryId  int
 	Category    Category
+	Quantity    int
+	Slug        string
 }

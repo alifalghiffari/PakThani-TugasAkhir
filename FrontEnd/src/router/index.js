@@ -170,7 +170,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const requiresAuth = ['Cart', 'Admin', 'AddProduct', 'EditProduct', 'AddCategory', 'EditCategory', 'AddImage'];
+  const requiresAuth = ['Cart', 'Order', 'Address', 'Admin', 'AddProduct', 'EditProduct', 'AddCategory', 'EditCategory', 'AddImage'];
   const authRequired = requiresAuth.includes(to.name);
 
   const isLoggedIn = localStorage.getItem('token');

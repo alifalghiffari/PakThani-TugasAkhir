@@ -93,3 +93,14 @@ func (controller *CategoryControllerImpl) FindAll(writer http.ResponseWriter, re
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
+
+func (controller *CategoryControllerImpl) GetAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	categoryResponses := controller.CategoryService.GetAll(request.Context())
+	webResponse := web.WebResponse{
+		Code:   200,
+		Status: "OK",
+		Data:   categoryResponses,
+	}
+
+	helper.WriteToResponseBody(writer, webResponse)
+}

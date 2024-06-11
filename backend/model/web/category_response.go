@@ -5,4 +5,5 @@ type CategoryResponse struct {
 	Category string            `json:"category"`
 	Icon     string            `json:"icon"`
 	Products []ProductResponse `json:"products"`
+	Slug     string            `json:"slug"`
 }

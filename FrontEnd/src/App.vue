@@ -24,7 +24,7 @@ export default {
   data() {
     return {
       // baseURL: 'https://limitless-lake-55070.herokuapp.com/',
-     baseURL: "http://localhost:3000/",
+      baseURL: "http://localhost:3000/",
       products: null,
       category: null,
       key: 0,
