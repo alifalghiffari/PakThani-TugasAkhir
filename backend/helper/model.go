@@ -76,6 +76,7 @@ func ToOrderItemsResponse(orderItems domain.OrderItems) web.OrderItemsResponse {
 		Id:        orderItems.Id,
 		OrderId:   orderItems.OrderId,
 		ProductId: orderItems.ProductId,
+		Product:   ToProductResponse(orderItems.Product),
 		Quantity:  orderItems.Quantity,
 		Price:     orderItems.Price,
 	}

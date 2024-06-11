@@ -59,7 +59,7 @@ func main() {
 	addressService := service.NewAddressService(addressRepository, userRepository, db, validate)
 	addressController := controller.NewAddressController(addressService)
 
-	orderItemsService := service.NewOrderItemsService(orderItemsRepository, userRepository, cartRepository, orderRepository, db, validate)
+	orderItemsService := service.NewOrderItemsService(orderItemsRepository, userRepository, productRepository, cartRepository, orderRepository, db, validate)
 	orderItemsController := controller.NewOrderItemsController(orderItemsService)
 
 	orderService := service.NewOrderService(orderRepository, userRepository, cartRepository, orderItemsRepository, db, validate)

@@ -34,11 +34,11 @@ func (controller *OrderItemsControllerImpl) FindOrderItemsById(writer http.Respo
 	helper.WriteToResponseBody(writer, webResponse)
 }
 
-func (controller *OrderItemsControllerImpl) FindOrderItemsByCartId(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-	cartId, err := strconv.Atoi(params.ByName("cartId"))
+func (controller *OrderItemsControllerImpl) FindOrderItemsByOrderId(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	orderId, err := strconv.Atoi(params.ByName("orderId"))
 	helper.PanicIfError(err)
 
-	orderItemsResponse := controller.OrderItemsService.FindByCartId(request.Context(), cartId)
+	orderItemsResponse := controller.OrderItemsService.FindByOrderId(request.Context(), orderId)
 	webResponse := web.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",
@@ -60,19 +60,3 @@ func (controller *OrderItemsControllerImpl) FindOrderItemsByUserId(writer http.R
 
 	helper.WriteToResponseBody(writer, webResponse)
 }
-
-// func (controller *OrderItemsControllerImpl) CreateOrderItems(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
-// 	userId := request.Context().Value("userId").(int)
-
-// 	var orderItemsCreateRequest web.OrderItemsCreateRequest
-// 	helper.ReadFromRequestBody(request, &orderItemsCreateRequest)
-
-// 	orderItemsResponse := controller.OrderItemsService.CreateOrderItems(request.Context(), orderItemsCreateRequest, userId)
-// 	webResponse := web.WebResponse{
-// 		Code:   http.StatusOK,
-// 		Status: "OK",
-// 		Data:   orderItemsResponse,
-// 	}
-
-// 	helper.WriteToResponseBody(writer, webResponse)
-// }
