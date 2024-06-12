@@ -49,10 +49,28 @@
             </span>
           </div>
         </div>
+        
         <div v-if="filteredProducts && filteredProducts.length > 0" class="search-results">
           <ul class="list-group">
-            <li class="list-group-item" v-for="item in filteredProducts" :key="item.id">
-              <router-link :to="{ name: 'ShowDetails', params: { id: item.id } }">{{ item.name }}</router-link>
+            <li class="list-group-item " v-for="item in filteredProducts" :key="item.id">
+              <div class="container">
+                <div class="row row-cols-3">
+                  <div class="col">
+                    <img :src="item.image" alt="">
+                  </div>
+                  <div class="col-sm-9">
+                    <p>{{ item.name }}</p>
+                    <div class="row">
+                      <div class="col-8 col-sm-6">
+                        <p>{{ item.price }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <router-link :to="{ name: 'ShowDetails', params: { id: item.id } }">Show Detail</router-link>
+                  </div>
+                </div>
+              </div>
             </li>
           </ul>
         </div>
@@ -130,7 +148,7 @@
         </li>
 
         <li class="nav-item">
-          <router-link class="nav-link text-light" :to="{ name: 'Order' }"
+          <router-link class="nav-link text-light" v-if="token && !isAdmin" :to="{ name: 'Order' }"
             >Orders</router-link
           >
         </li>
@@ -253,11 +271,12 @@ export default {
 
 .search-results {
   top:50px;
-  margin-top: 10px;
+  margin-top: 6px;
   position: absolute;
-  background-color: #ffffff;
+  background-color: #000000;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   max-height: 300px;
+  max-width:1000vh;
   overflow-y: auto;
   z-index: 2;
 }

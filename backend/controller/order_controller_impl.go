@@ -77,12 +77,14 @@ func (controller *OrderControllerImpl) CreateOrder(writer http.ResponseWriter, r
 
 func (controller *OrderControllerImpl) UpdateOrder(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	orderUpdateRequest := web.OrderUpdateRequest{}
-	userId := request.Context().Value("userId").(int)
+	helper.ReadFromRequestBody(request, &orderUpdateRequest)
 
-	Id, err := strconv.Atoi(params.ByName("Id"))
+	id, err := strconv.Atoi(params.ByName("orderId"))
 	helper.PanicIfError(err)
 
-	orderResponse := controller.OrderService.UpdateOrder(request.Context(), orderUpdateRequest, Id, userId)
+	orderUpdateRequest.Id = id
+
+	orderResponse := controller.OrderService.UpdateOrder(request.Context(), orderUpdateRequest)
 	webResponse := web.WebResponse{
 		Code:   http.StatusOK,
 		Status: "OK",

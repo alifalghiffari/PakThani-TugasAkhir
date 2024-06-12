@@ -70,6 +70,8 @@ func ToOrderResponse(order domain.Order) web.OrderResponse {
 		OrderStatus:   string(order.OrderStatus),
 		PaymentStatus: string(order.PaymentStatus),
 		OrderItems:    ToOrderItemsResponses(order.OrderItems),
+		User:          ToUserResponse(order.User),
+		Address:       ToAddressResponse(order.Address),
 	}
 }
 

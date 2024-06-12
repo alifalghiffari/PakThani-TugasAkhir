@@ -16,6 +16,8 @@ import Cart from '../views/Cart/Cart.vue'
 import Checkout from '../views/Checkout/Checkout.vue'
 import Address from '../views/Checkout/Address.vue'
 import Order from '../views/Orders/Order.vue'
+import OrderAdmin from '../views/Orders/OrderAdmin.vue'
+import OrderDetailsAdmin from '../views/Orders/OrderDetailsAdmin.vue'
 
 import Category from '../views/Category/Category.vue'
 import AddCategory from '../views/Category/AddCategory.vue'
@@ -105,6 +107,16 @@ const routes = [
     name : 'ListProducts',
     component: ListProducts
   },
+  {
+    path: '/admin/order/',
+    name: 'OrderAdmin',
+    component: OrderAdmin
+  },
+  {
+    path: '/admin/order/:id',
+    name: 'OrderDetailsAdmin',
+    component: OrderDetailsAdmin
+  },
   //Page Not found
   {
     path : '/:catchAll(.*)',
@@ -170,7 +182,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const requiresAuth = ['Cart', 'Order', 'Address', 'Admin', 'AddProduct', 'EditProduct', 'AddCategory', 'EditCategory', 'AddImage'];
+  const requiresAuth = ['Cart', 'Order', 'Address', 'Admin', 'AddProduct', 'EditProduct', 'AddCategory', 'EditCategory', 'AddImage', 'OrderAdmin', 'OrderDetailsAdmin'];
   const authRequired = requiresAuth.includes(to.name);
 
   const isLoggedIn = localStorage.getItem('token');
@@ -187,7 +199,7 @@ router.beforeEach((to, from, next) => {
         next();
       } else {
         //how to create this user can access all page except admin page
-        if (to.name === 'Admin' || to.name === 'AddProduct' || to.name === 'EditProduct' || to.name === 'AddCategory' || to.name === 'EditCategory' || to.name === 'AddImage') {
+        if (to.name === 'Admin' || to.name === 'AddProduct' || to.name === 'EditProduct' || to.name === 'AddCategory' || to.name === 'EditCategory' || to.name === 'AddImage' || to.name === 'OrderAdmin' || to.name === 'OrderDetailsAdmin') {
           next('/');
         } else {
           next();

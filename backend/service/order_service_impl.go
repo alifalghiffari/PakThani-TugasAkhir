@@ -158,7 +158,7 @@ func (service *OrderServiceImpl) CreateOrder(ctx context.Context, request web.Or
 	return helper.ToOrderResponse(order)
 }
 
-func (service *OrderServiceImpl) UpdateOrder(ctx context.Context, request web.OrderUpdateRequest, Id int, userId int) web.OrderResponse {
+func (service *OrderServiceImpl) UpdateOrder(ctx context.Context, request web.OrderUpdateRequest) web.OrderResponse {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
 
@@ -166,23 +166,10 @@ func (service *OrderServiceImpl) UpdateOrder(ctx context.Context, request web.Or
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	order, err := service.OrderRepository.FindById(ctx, tx, Id)
-	if err != nil {
-		panic(exception.NewNotFoundError(err.Error()))
-	}
-
-	if order.UserId != userId {
-		helper.PanicIfError(err)
-	}
-
-	orderStatus := mapToOrderStatus(request.OrderStatus)
-	paymentStatus := mapToPaymentStatus(request.PaymentStatus)
-
-	order = domain.Order{
-		Id:            order.Id,
-		UserId:        order.UserId,
-		OrderStatus:   orderStatus,
-		PaymentStatus: paymentStatus,
+	order := domain.Order{
+		Id:            request.Id,
+		OrderStatus:   mapToOrderStatus(request.OrderStatus),
+		PaymentStatus: mapToPaymentStatus(request.PaymentStatus),
 	}
 
 	order = service.OrderRepository.Update(ctx, tx, order)
@@ -191,49 +178,49 @@ func (service *OrderServiceImpl) UpdateOrder(ctx context.Context, request web.Or
 }
 
 func (service *OrderServiceImpl) FindOrderByUserId(ctx context.Context, userId int) []web.OrderResponse {
-    tx, err := service.DB.Begin()
-    helper.PanicIfError(err)
-    defer helper.CommitOrRollback(tx)
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
 
-    orders, err := service.OrderRepository.FindByUserId(ctx, tx, userId)
-    if err != nil {
-        panic(exception.NewNotFoundError(err.Error()))
-    }
+	orders, err := service.OrderRepository.FindByUserId(ctx, tx, userId)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
-    var orderResponses []web.OrderResponse
+	var orderResponses []web.OrderResponse
 
-    for _, order := range orders {
-        orderItems, err := service.OrderItemsRepository.FindByOrderId(ctx, tx, order.Id)
-        if err != nil {
-            panic(exception.NewNotFoundError(err.Error()))
-        }
+	for _, order := range orders {
+		orderItems, err := service.OrderItemsRepository.FindByOrderId(ctx, tx, order.Id)
+		if err != nil {
+			panic(exception.NewNotFoundError(err.Error()))
+		}
 
-        var orderItemsResponses []web.OrderItemsResponse
-        for _, orderItem := range orderItems {
-            orderItemsResponse := web.OrderItemsResponse{
-                Id:        orderItem.Id,
-                OrderId:   orderItem.OrderId,
-                ProductId: orderItem.ProductId,
-                Quantity:  orderItem.Quantity,
-                Price:     orderItem.Price,
-            }
-            orderItemsResponses = append(orderItemsResponses, orderItemsResponse)
-        }
+		var orderItemsResponses []web.OrderItemsResponse
+		for _, orderItem := range orderItems {
+			orderItemsResponse := web.OrderItemsResponse{
+				Id:        orderItem.Id,
+				OrderId:   orderItem.OrderId,
+				ProductId: orderItem.ProductId,
+				Quantity:  orderItem.Quantity,
+				Price:     orderItem.Price,
+			}
+			orderItemsResponses = append(orderItemsResponses, orderItemsResponse)
+		}
 
-        orderResponse := web.OrderResponse{
-            Id:            order.Id,
-            UserId:        order.UserId,
-            TotalItems:    order.TotalItems,
-            TotalPrice:    order.TotalPrice,
-            OrderStatus:   string(order.OrderStatus),
-            PaymentStatus: string(order.PaymentStatus),
-            OrderItems:    orderItemsResponses,
-        }
+		orderResponse := web.OrderResponse{
+			Id:            order.Id,
+			UserId:        order.UserId,
+			TotalItems:    order.TotalItems,
+			TotalPrice:    order.TotalPrice,
+			OrderStatus:   string(order.OrderStatus),
+			PaymentStatus: string(order.PaymentStatus),
+			OrderItems:    orderItemsResponses,
+		}
 
-        orderResponses = append(orderResponses, orderResponse)
-    }
+		orderResponses = append(orderResponses, orderResponse)
+	}
 
-    return orderResponses
+	return orderResponses
 }
 
 func (service *OrderServiceImpl) FindOrderById(ctx context.Context, Id int, userId int) web.OrderResponse {

@@ -8,4 +8,6 @@ type OrderResponse struct {
 	OrderStatus   string               `json:"order_status"`
 	PaymentStatus string               `json:"payment_status"`
 	OrderItems    []OrderItemsResponse `json:"order_items"`
+	User          UserResponse         `json:"user"`
+	Address       AddressResponse      `json:"address"`
 }

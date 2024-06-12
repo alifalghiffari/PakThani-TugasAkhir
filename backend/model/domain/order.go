@@ -9,24 +9,26 @@ type Order struct {
 	OrderStatus   OrderStatus   // Status pesanan (misalnya: pending, diproses, selesai, dll.)
 	PaymentStatus PaymentStatus // Status pembayaran pesanan (misalnya: pending, berhasil, gagal, dll.)
 	OrderItems    []OrderItems  // Item dalam pesanan
+	User          User
+	Address       Address
 }
 
 // OrderStatus mendefinisikan status pesanan
 type OrderStatus string
 
 const (
-	Pending    OrderStatus = "pending"
-	Processing OrderStatus = "processing"
-	Shipped    OrderStatus = "shipped"
-	Delivered  OrderStatus = "delivered"
-	Cancelled  OrderStatus = "cancelled"
+	Pending    OrderStatus = "Pending"
+	Processing OrderStatus = "Processing"
+	Shipped    OrderStatus = "Shipped"
+	Delivered  OrderStatus = "Delivered"
+	Cancelled  OrderStatus = "Cancelled"
 )
 
 // PaymentStatus mendefinisikan status pembayaran pesanan
 type PaymentStatus string
 
 const (
-	PaymentPending PaymentStatus = "pending"
-	PaymentSuccess PaymentStatus = "success"
-	PaymentFailed  PaymentStatus = "failed"
+	PaymentPending PaymentStatus = "Pending"
+	PaymentSuccess PaymentStatus = "Success"
+	PaymentFailed  PaymentStatus = "Failed"
 )

@@ -12,7 +12,7 @@
         </router-link>
       </div>
       <div class="col">
-        <router-link :to="{ name: 'Order' }">
+        <router-link :to="{ name: 'OrderAdmin' }">
           <button type="button" class="btn btn-primary btn-lg">Admin Order</button>
         </router-link>
       </div>
