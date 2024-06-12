@@ -31,7 +31,7 @@ func NewRouter(categoryController controller.CategoryController,
 
 	// Order Items
 	router.GET("/api/orderitems/edit/:orderItemId", authMiddleware.ApplyMiddleware(orderItemsController.FindOrderItemsById))
-	router.GET("/api/orderitems/carts/:cartId", authMiddleware.ApplyMiddleware(orderItemsController.FindOrderItemsByOrderId))
+	router.GET("/api/orderitems/carts/:orderId", authMiddleware.ApplyMiddleware(orderItemsController.FindOrderItemsByOrderId))
 	router.GET("/api/orderitems/users", authMiddleware.ApplyMiddleware(orderItemsController.FindOrderItemsByUserId))
 	// router.POST("/api/orderitems", authMiddleware.ApplyMiddleware(orderItemsController.CreateOrderItems))
 

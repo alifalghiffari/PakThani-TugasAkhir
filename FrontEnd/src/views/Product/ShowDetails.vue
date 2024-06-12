@@ -24,12 +24,7 @@
           </div>
 
           <div class="input-group col-md-3 col-4 p-0">
-            <button
-              type="button"
-              id="add-to-cart-button"
-              class="btn"
-              @click="addToCart(this.id)"
-            >
+            <button type="button" id="add-to-cart-button" class="btn" @click="addToCart(this.id)">
               Add to Cart
               <ion-icon name="cart-outline" v-pre></ion-icon>
             </button>
@@ -141,20 +136,20 @@ export default {
             },
           })
           .then((response) => {
-              if (response.data.code === 200) {
-                swal({
-                  text: "Product Added to the cart!",
-                  icon: "success",
-                  closeOnClickOutside: false,
-                });
-                // refresh nav bar
-                this.$emit("fetchData");
-              }
+            if (response.data.code === 200) {
+              swal({
+                text: "Product Added to the cart!",
+                icon: "success",
+                closeOnClickOutside: false,
+              });
+              // refresh nav bar
+              this.$emit("fetchData");
+            }
           })
           .catch((error) => {
-              console.log(error);
+            console.log(error);
           });
-        }
+      }
     },
 
     // listCartItems() {

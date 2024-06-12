@@ -36,7 +36,7 @@
           </div>
           <div class="form-group">
             <label>Stock</label>
-            <input type="number" class="form-control" v-model.number="product.stock" required>
+            <input type="number" class="form-control" v-model.number="product.quantity" required>
           </div>
           <button type="submit" class="btn btn-primary">Submit</button>
         </form>
@@ -48,7 +48,7 @@
 
 <script>
 export default {
-  data(){
+  data() {
     return {
       product: null,
       categories: [],
@@ -64,8 +64,8 @@ export default {
       this.getCategories();
     }
   },
-  props : ["baseURL", "products"],
-  methods : {
+  props: ["baseURL", "products"],
+  methods: {
     getCategories() {
       axios.get(`${this.baseURL}api/category`, {
         headers: {
@@ -93,12 +93,12 @@ export default {
         description: this.product.description,
         image: this.product.image,
         price: this.product.price,
-        stock: this.product.stock,
+        quantity: this.product.quantity,
         slug: slug,
       };
 
       console.log(editProduct);
-      
+
       axios.put(`${this.baseURL}/api/products/${this.product.id}`, editProduct, {
         headers: {
           Authorization: `Bearer ${this.token}`,
@@ -132,5 +132,4 @@ h4 {
   color: #484848;
   font-weight: 700;
 }
-
 </style>

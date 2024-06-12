@@ -50,7 +50,7 @@
 import axios from 'axios';
 
 export default {
-  data(){
+  data() {
     return {
       categoryId: null,
       name: null,
@@ -62,8 +62,8 @@ export default {
       token: localStorage.getItem('token'),
     }
   },
-  props : ["baseURL"],
-  methods : {
+  props: ["baseURL"],
+  methods: {
     getCategories() {
       axios.get(`${this.baseURL}api/category`, {
         headers: {
@@ -86,7 +86,7 @@ export default {
         description: this.description,
         image: this.imageURL,
         price: this.price,
-        stock: this.stock,
+        quantity: this.stock,
         slug: slug,
       };
 
@@ -130,5 +130,4 @@ h4 {
   color: #484848;
   font-weight: 700;
 }
-
 </style>

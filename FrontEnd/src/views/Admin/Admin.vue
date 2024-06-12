@@ -2,22 +2,17 @@
   <div class="adminPanel container">
     <div class="row">
       <div class="col">
-        <router-link :to="{name : 'AdminProduct'}">
+        <router-link :to="{ name: 'AdminProduct' }">
           <button type="button" class="btn btn-primary btn-lg">Admin Products</button>
         </router-link>
       </div>
       <div class="col">
-        <router-link :to="{name : 'AdminCategory'}">
+        <router-link :to="{ name: 'AdminCategory' }">
           <button type="button" class="btn btn-primary btn-lg">Admin Categories</button>
         </router-link>
       </div>
       <div class="col">
-        <router-link :to="{name : 'Gallery'}">
-          <button type="button" class="btn btn-primary btn-lg">Admin Gallery</button>
-        </router-link>
-      </div>
-      <div class="col">
-        <router-link :to="{name : 'Order'}">
+        <router-link :to="{ name: 'Order' }">
           <button type="button" class="btn btn-primary btn-lg">Admin Order</button>
         </router-link>
       </div>
@@ -29,7 +24,7 @@
 export default {
   mounted() {
     if (!localStorage.getItem('token')) {
-      this.$router.push({name : 'Signin'});
+      this.$router.push({ name: 'Signin' });
     }
   }
 }
@@ -37,12 +32,13 @@ export default {
 
 
 <style>
-.adminPanel{
-  display : flex;
+.adminPanel {
+  display: flex;
   flex-direction: column;
   align-items: center;
 }
-.adminPanel button{
+
+.adminPanel button {
   font-size: 30px;
   width: fit-content;
   margin: 55px 0;
