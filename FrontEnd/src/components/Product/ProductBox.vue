@@ -3,7 +3,7 @@
     <div class="embed-responsive embed-responsive-16by9">
       <img
         class="card-img-top embed-responsive-item"
-        :src="product.image"
+        :src="getImagePath(product.image)"
         alt="Product Image"
       />
     </div>
@@ -27,10 +27,14 @@
 </template>
 
 <script>
+
 export default {
   name: "ProductBox",
   props: ["product"],
   methods: {
+    getImagePath(image) {
+      return require(`../../assets/img-main/${image}`);
+    },
     showDetails() {
       this.$router.push({
         name: "ShowDetails",

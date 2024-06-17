@@ -18,7 +18,7 @@
               <router-link v-bind:to="'/admin/order/'+order.id">Order No : {{order.id}}</router-link>
             </h6>
             <p class="mb-0">{{order.total_items}} item<span v-if="order.total_items > 1">s</span></p>
-            <p id="item-price" class="mb-0 font-weight-bold">Total Cost : $ {{order.total_price}}</p>
+            <p id="item-price" class="mb-0 font-weight-bold">Total Cost : Rp. {{order.total_price}}</p>
             <!-- <p id="item-username">Ordered By : {{order.username}}</p> -->
             <form  @submit.prevent="submitStatus(order)">
                 <div class="row align-items-end">

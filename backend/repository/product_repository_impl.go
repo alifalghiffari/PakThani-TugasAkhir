@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"project-workshop/go-api-ecom/helper"
 	"project-workshop/go-api-ecom/model/domain"
 )
@@ -43,53 +44,91 @@ func (repository *ProductRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx,
 
 func (repository *ProductRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, productId int) (domain.Product, error) {
 	SQL := `
-		SELECT p.id, p.name, p.image, p.description, p.price, p.category_id, p.quantity, p.slug, c.category
+		SELECT p.id, p.name, p.image, p.description, p.price, p.category_id, p.quantity, p.slug, c.category, i.id, i.image
 		FROM product p
 		JOIN category c ON p.category_id = c.id
+		LEFT JOIN images i ON p.id = i.product_id
 		WHERE p.id = ?
 	`
 	rows, err := tx.QueryContext(ctx, SQL, productId)
 	if err != nil {
-		return domain.Product{}, err // Mengembalikan product kosong dan error
+		return domain.Product{}, err
 	}
 	defer rows.Close()
 
 	product := domain.Product{}
-	if rows.Next() {
-		err := rows.Scan(&product.Id, &product.Name, &product.Image, &product.Description, &product.Price, &product.CategoryId, &product.Quantity, &product.Slug, &product.Category.Category)
+	images := []domain.Image{}
+
+	// Use a map to check if we have already set the product's basic details
+	productSet := false
+
+	for rows.Next() {
+		var img domain.Image
+		var category string
+
+		err := rows.Scan(
+			&product.Id, &product.Name, &product.Image, &product.Description,
+			&product.Price, &product.CategoryId, &product.Quantity, &product.Slug,
+			&category, &img.Id, &img.Image,
+		)
 		if err != nil {
-			return domain.Product{}, err // Mengembalikan product kosong dan error jika terjadi kesalahan saat pemindaian rows
+			return domain.Product{}, err
 		}
-		return product, nil // Mengembalikan product yang ditemukan tanpa error
+
+		if !productSet {
+			product.Category = domain.Category{Category: category}
+			productSet = true
+		}
+
+		// Check if the image ID is not null (in case there are no images)
+		if img.Id != 0 {
+			img.ProductId = product.Id
+			images = append(images, img)
+		}
 	}
 
-	return domain.Product{}, errors.New("product is not found") // Jika tidak ada baris yang ditemukan, kembalikan error bahwa produk tidak ditemukan
+	if !productSet {
+		return domain.Product{}, errors.New("product is not found")
+	}
+
+	product.Images = images
+	return product, nil
 }
 
 func (repository *ProductRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Product {
 	SQL := `
-		SELECT p.id, p.name, p.image, p.description, p.price, p.category_id, p.quantity, p.slug, c.category
+		SELECT p.id, p.name, p.image, p.description, p.price, p.category_id, p.quantity, p.slug, c.category, i.id, i.product_id, i.image
 		FROM product p
 		JOIN category c ON p.category_id = c.id
+		LEFT JOIN images i ON p.id = i.product_id
 	`
 	rows, err := tx.QueryContext(ctx, SQL)
 	if err != nil {
-		return nil // Mengembalikan nil slice product dan error
+		fmt.Println("err", err)
 	}
 	defer rows.Close()
 
 	var products []domain.Product
+	productMap := make(map[int]*domain.Product)
 	for rows.Next() {
 		product := domain.Product{}
-		err := rows.Scan(&product.Id, &product.Name, &product.Image, &product.Description, &product.Price, &product.CategoryId, &product.Quantity, &product.Slug, &product.Category.Category)
+		image := domain.Image{}
+		err := rows.Scan(&product.Id, &product.Name, &product.Image, &product.Description, &product.Price, &product.CategoryId, &product.Quantity, &product.Slug, &product.Category.Category, &image.Id, &image.ProductId, &image.Image)
 		if err != nil {
-			return nil // Mengembalikan nil slice product dan error jika terjadi kesalahan saat pemindaian rows
+			fmt.Println("err1", err)
 		}
-		products = append(products, product) // Menambahkan product ke slice products
+		if _, ok := productMap[product.Id]; !ok {
+			productMap[product.Id] = &product
+		}
+		productMap[product.Id].Images = append(productMap[product.Id].Images, image)
+	}
+
+	for _, product := range productMap {
+		products = append(products, *product)
 	}
 
 	if len(products) == 0 {
-		return nil // Jika tidak ada produk yang ditemukan, kembalikan error
+		fmt.Println("err2", err)
 	}
 
 	return products // Mengembalikan slice product dan tanpa error

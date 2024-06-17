@@ -1,7 +1,56 @@
 <template>
   <div id="home">
     <!-- Page Wrapper -->
-    <div id="background-div" class="page-holder bg-cover">
+    <div id="carouselBackground" class="carousel slide page-holder bg-cover" data-ride="carousel">
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <div class="page-holder bg-cover" id="bg1">
+            <div class="container py-5">
+              <header class="text-left text-white py-5">
+                <h3 class="mb-4 rounded">
+                  <a href="#start-shopping" class="bg-white px-2 py-2 rounded" id="heading">Start Shopping</a>
+                </h3>
+                <p id="content" class="lead mb-0 bg-dark p-1 rounded">Start Shopping with Us</p>
+              </header>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="page-holder bg-cover" id="bg2">
+            <div class="container py-5">
+              <header class="text-left text-white py-5">
+                <h3 class="mb-4 rounded">
+                  <a href="#start-shopping" class="bg-white px-2 py-2 rounded" id="heading">Start Shopping</a>
+                </h3>
+                <p id="content" class="lead mb-0 bg-dark p-1 rounded">Start Shopping with Us</p>
+              </header>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="page-holder bg-cover" id="bg3">
+            <div class="container py-5">
+              <header class="text-left text-white py-5">
+                <h3 class="mb-4 rounded">
+                  <a href="#start-shopping" class="bg-white px-2 py-2 rounded" id="heading">Start Shopping</a>
+                </h3>
+                <p id="content" class="lead mb-0 bg-dark p-1 rounded">Start Shopping with Us</p>
+              </header>
+            </div>
+          </div>
+        </div>
+      </div>
+      <a class="carousel-control-prev" href="#carouselBackground" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#carouselBackground" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
+
+    <!-- <div id="background-div" class="page-holder bg-cover">
 
       <div class="container py-5">
         <header class="text-left text-white py-5">
@@ -9,7 +58,7 @@
           <p id="content" class="lead mb-0 bg-dark p-1 rounded">Start Shopping with Us</p>
         </header>
       </div>
-    </div>
+    </div> -->
 
     <div id="start-shopping" class="container">
       <div class="row">
@@ -75,8 +124,16 @@
     background-size: cover !important;
   }
 
-  #background-div {
-    background: url(../assets/homeview.jpg)
+  #bg1 {
+    background: url(../assets/homeview.jpg);
+  }
+
+  #bg2 {
+    background: url(../assets/home2.jpg);
+  }
+
+  #bg3 {
+    background: url(../assets/home3.jpg);
   }
 
   #heading {

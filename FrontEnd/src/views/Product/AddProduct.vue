@@ -27,8 +27,12 @@
             <input type="text" class="form-control" v-model="description" required>
           </div>
           <div class="form-group">
-            <label>ImageURL</label>
-            <input type="text" class="form-control" v-model="imageURL" required>
+            <label for="imageURL">Main Image</label>
+            <input type="file" class="form-control-file" id="imageURL" ref="imageURL" @change="handleFileUploadMain">
+          </div>
+          <div class="custom-file mb-3">
+            <input multiple type="file" class="custom-file-input" id="image1" name="image1" ref="image1" @change="handleFileUpload">
+            <label class="custom-file-label" for="image1">Image Optional</label>
           </div>
           <div class="form-group">
             <label>Price</label>
@@ -58,7 +62,9 @@ export default {
       imageURL: null,
       price: null,
       stock: null,
+      image1: [],
       categories: [],
+      imgMain: '',
       token: localStorage.getItem('token'),
     }
   },
@@ -79,20 +85,59 @@ export default {
     },
     addProduct() {
       const slug = this.generateSlug(this.name);
+      const base64Images = [];
 
+      if (this.$refs.imageURL.files.length > 0) {
+        const file = this.$refs.imageURL.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          let base64 = reader.result.split(',')[1];
+          this.imgMain = base64;
+
+          this.handleOptionalImages(slug, base64Images);
+        };
+      } else {
+        this.handleOptionalImages(slug, base64Images);
+      }
+    },
+    handleOptionalImages(slug, base64Images) {
+      const files = this.$refs.image1.files;
+
+      if (files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => {
+            let base64String = reader.result.split(',')[1];
+            base64Images.push(base64String);
+
+            if (base64Images.length === files.length) {
+              this.submitProduct(slug, base64Images);
+            }
+          };
+        }
+      } else {
+        this.submitProduct(slug, base64Images);
+      }
+    },
+    submitProduct(slug, base64Images) {
       const newProduct = {
         category_id: this.categoryId,
         name: this.name,
         description: this.description,
-        image: this.imageURL,
+        image: this.imgMain,
         price: this.price,
         quantity: this.stock,
         slug: slug,
+        images: base64Images,
       };
 
       axios.post(`${this.baseURL}api/products`, newProduct, {
         headers: {
           Authorization: `Bearer ${this.token}`,
+          'Content-Type': 'application/json',
         },
       }).then((res) => {
         if (res.data.code === 200) {
@@ -109,10 +154,15 @@ export default {
       });
     },
     generateSlug(name) {
-      // Remove special characters and replace spaces with hyphens
       const slug = name.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/ /g, '-');
       return slug;
     },
+    handleFileUploadMain(event) {
+      this.imageURL = event.target.files;
+    },
+    handleFileUpload(event) {
+      this.image1 = event.target.files;
+    }
   },
   mounted() {
     if (!this.token) {

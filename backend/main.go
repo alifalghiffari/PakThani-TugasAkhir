@@ -38,11 +38,12 @@ func main() {
 	cartRepository := repository.NewCartRepositoryImpl()
 	orderItemsRepository := repository.NewOrderItemsRepositoryImpl()
 	orderRepository := repository.NewOrderRepositoryImpl()
+	imageRepository := repository.NewImageRepositoryImpl()
 
 	categoryService := service.NewCategoryService(categoryRepository, db, validate)
 	categoryController := controller.NewCategoryController(categoryService)
 
-	productService := service.NewProductService(productRepository, db, validate)
+	productService := service.NewProductService(productRepository, imageRepository, db, validate)
 	productController := controller.NewProductController(productService)
 
 	userService := service.NewUserService(userRepository, db, validate, smtpAuth, smtpHost, smtpPort)

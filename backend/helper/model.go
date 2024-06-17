@@ -58,6 +58,15 @@ func ToProductResponse(product domain.Product) web.ProductResponse {
 		Category:    product.Category.Category,
 		Quantity:    product.Quantity,
 		Slug:        product.Slug,
+		Images:      ToImageReponses(product.Images),
+	}
+}
+
+func ToImageResponse(image domain.Image) web.ImageResponse {
+	return web.ImageResponse{
+		Id:        image.Id,
+		ProductId: image.ProductId,
+		Image:     image.Image,
 	}
 }
 
@@ -174,4 +183,13 @@ func ToAddressResponses(addresses []domain.Address) []web.AddressResponse {
 	}
 
 	return addressResponses
+}
+
+func ToImageReponses(images []domain.Image) []web.ImageResponse {
+	var imagesResponse []web.ImageResponse
+	for _, image := range images {
+		imagesResponse = append(imagesResponse, ToImageResponse(image))
+	}
+
+	return imagesResponse
 }

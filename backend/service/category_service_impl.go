@@ -3,6 +3,10 @@ package service
 import (
 	"context"
 	"database/sql"
+	"encoding/base64"
+	"fmt"
+	"os"
+	"path"
 	"project-workshop/go-api-ecom/exception"
 	"project-workshop/go-api-ecom/helper"
 	"project-workshop/go-api-ecom/model/domain"
@@ -10,6 +14,7 @@ import (
 	"project-workshop/go-api-ecom/repository"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 )
 
 type CategoryServiceImpl struct {
@@ -34,9 +39,17 @@ func (service *CategoryServiceImpl) Create(ctx context.Context, request web.Cate
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
+	base64Data, err := base64.StdEncoding.DecodeString(request.Icon)
+	helper.PanicIfError(err)
+	filename := fmt.Sprintf("%s.png", uuid.New().String())
+	filepath := path.Join("E:/Github/PakThani-TugasAkhir/FrontEnd/src/assets/Icon", filename)
+
+	err = os.WriteFile(filepath, base64Data, 0644)
+	helper.PanicIfError(err)
+
 	category := domain.Category{
 		Category: request.Category,
-		Icon:     request.Icon,
+		Icon:     filename,
 		Slug:     request.Slug,
 	}
 
@@ -58,8 +71,25 @@ func (service *CategoryServiceImpl) Update(ctx context.Context, request web.Cate
 		panic(exception.NewNotFoundError(err.Error()))
 	}
 
+	if request.Icon != "" {
+		base64Data, err := base64.StdEncoding.DecodeString(request.Icon)
+		helper.PanicIfError(err)
+		filename := fmt.Sprintf("%s.png", uuid.New().String())
+
+		oldFilepath := path.Join("E:/Github/PakThani-TugasAkhir/FrontEnd/src/assets/Icon", category.Icon)
+		if _, err := os.Stat(oldFilepath); err == nil {
+			err = os.Remove(oldFilepath)
+			helper.PanicIfError(err)
+		}
+
+		filepath := path.Join("E:/Github/PakThani-TugasAkhir/FrontEnd/src/assets/Icon", filename)
+		err = os.WriteFile(filepath, base64Data, 0644)
+		helper.PanicIfError(err)
+
+		category.Icon = filename
+	}
+
 	category.Category = request.Category
-	category.Icon = request.Icon
 	category.Slug = request.Slug
 
 	category = service.CategoryRepository.Update(ctx, tx, category)

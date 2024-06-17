@@ -3,24 +3,33 @@ package service
 import (
 	"context"
 	"database/sql"
+	"encoding/base64"
+	"fmt"
+	"os"
+	"path"
 	"project-workshop/go-api-ecom/exception"
 	"project-workshop/go-api-ecom/helper"
 	"project-workshop/go-api-ecom/model/domain"
 	"project-workshop/go-api-ecom/model/web"
 	"project-workshop/go-api-ecom/repository"
+	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 )
 
 type ProductServiceImpl struct {
 	ProductRepository repository.ProductRepository
+	ImageRepository   repository.ImageRepository
 	DB                *sql.DB
 	Validate          *validator.Validate
+	ImagePath         string
 }
 
-func NewProductService(productRepository repository.ProductRepository, DB *sql.DB, validate *validator.Validate) ProductService {
+func NewProductService(productRepository repository.ProductRepository, imageRepository repository.ImageRepository, DB *sql.DB, validate *validator.Validate) ProductService {
 	return &ProductServiceImpl{
 		ProductRepository: productRepository,
+		ImageRepository:   imageRepository,
 		DB:                DB,
 		Validate:          validate,
 	}
@@ -34,10 +43,18 @@ func (service *ProductServiceImpl) Create(ctx context.Context, request web.Produ
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
+	base64Data, err := base64.StdEncoding.DecodeString(request.Image)
+	helper.PanicIfError(err)
+	filename := fmt.Sprintf("%s.png", uuid.New().String())
+	filepath := path.Join("E:/Github/PakThani-TugasAkhir/FrontEnd/src/assets/img-main", filename)
+
+	err = os.WriteFile(filepath, base64Data, 0644)
+	helper.PanicIfError(err)
+
 	product := domain.Product{
 		Name:        request.Name,
 		Description: request.Description,
-		Image:       request.Image,
+		Image:       filename,
 		Price:       request.Price,
 		CategoryId:  request.CategoryId,
 		Quantity:    request.Quantity,
@@ -45,6 +62,38 @@ func (service *ProductServiceImpl) Create(ctx context.Context, request web.Produ
 	}
 
 	product = service.ProductRepository.Save(ctx, tx, product)
+
+	var images []domain.Image
+	for _, base64String := range request.Images {
+		base64Data, err := base64.StdEncoding.DecodeString(base64String)
+		helper.PanicIfError(err)
+
+		//timestamp := time.Now().Unix()
+		//filename := fmt.Sprintf("%d.png", timestamp)
+
+		filename := fmt.Sprintf("%s.png", uuid.New().String())
+		filepath := path.Join("E:/Github/PakThani-TugasAkhir/FrontEnd/src/assets/img", filename)
+		err = os.WriteFile(filepath, base64Data, 0644)
+		helper.PanicIfError(err)
+
+		//hasher := sha256.New()
+		//hasher.Write(base64Data)
+		//hash := hex.EncodeToString(hasher.Sum(nil))
+		//filename := fmt.Sprintf("%s.png", hash)
+
+		image := domain.Image{
+			ProductId:  product.Id,
+			Image:      filename,
+			Created_at: time.Now(),
+			Updated_at: time.Now(),
+		}
+
+		images = append(images, image)
+	}
+
+	for _, img := range images {
+		service.ImageRepository.AddImage(ctx, tx, img)
+	}
 
 	return helper.ToProductResponse(product)
 }
@@ -62,15 +111,70 @@ func (service *ProductServiceImpl) Update(ctx context.Context, request web.Produ
 		panic(exception.NewNotFoundError(err.Error()))
 	}
 
+	existingImages, err := service.ImageRepository.FindByProductId(ctx, tx, product.Id)
+	if err != nil {
+		fmt.Println("Error fetching existing images:", err)
+	}
+
+	if request.Image != "" {
+		base64Data, err := base64.StdEncoding.DecodeString(request.Image)
+		helper.PanicIfError(err)
+		filename := fmt.Sprintf("%s.png", uuid.New().String())
+
+		oldFilepath := path.Join("E:/Github/PakThani-TugasAkhir/FrontEnd/src/assets/img-main", product.Image)
+		if _, err := os.Stat(oldFilepath); err == nil {
+			err = os.Remove(oldFilepath)
+			helper.PanicIfError(err)
+		}
+
+		filepath := path.Join("E:/Github/PakThani-TugasAkhir/FrontEnd/src/assets/img-main", filename)
+		err = os.WriteFile(filepath, base64Data, 0644)
+		helper.PanicIfError(err)
+
+		product.Image = filename
+	}
+
 	product.Name = request.Name
 	product.Description = request.Description
-	product.Image = request.Image
 	product.Price = request.Price
 	product.CategoryId = request.CategoryId
 	product.Quantity = request.Quantity
 	product.Slug = request.Slug
 
 	product = service.ProductRepository.Update(ctx, tx, product)
+
+	var images []domain.Image
+	for idx, base64String := range request.Images {
+		base64Data, err := base64.StdEncoding.DecodeString(base64String)
+		helper.PanicIfError(err)
+
+		filename := fmt.Sprintf("%s.png", uuid.New().String())
+
+		image := domain.Image{
+			Id:         existingImages[idx].Id,
+			ProductId:  product.Id,
+			Image:      filename,
+			Updated_at: time.Now(),
+		}
+
+		images = append(images, image)
+
+		oldFilepath := path.Join("E:/Github/PakThani-TugasAkhir/FrontEnd/src/assets/img", existingImages[idx].Image)
+		err = os.Remove(oldFilepath)
+		helper.PanicIfError(err)
+
+		filepath := path.Join("E:/Github/PakThani-TugasAkhir/FrontEnd/src/assets/img", filename)
+		err = os.WriteFile(filepath, base64Data, 0644)
+		helper.PanicIfError(err)
+	}
+
+	for _, img := range images {
+		if img.Id == 0 {
+			service.ImageRepository.AddImage(ctx, tx, img)
+		} else {
+			service.ImageRepository.UpdateImage(ctx, tx, img)
+		}
+	}
 
 	return helper.ToProductResponse(product)
 }
@@ -110,3 +214,38 @@ func (service *ProductServiceImpl) FindAll(ctx context.Context) []web.ProductRes
 
 	return helper.ToProductResponses(products)
 }
+
+//func saveImage(file *multipart.FileHeader, basePath string, productId int) (string, error) {
+// 	src, err := file.Open()
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	defer src.Close()
+
+// 	// Membuat direktori jika belum ada
+// 	folderPath := filepath.Join(basePath, fmt.Sprintf("product-%d", productId))
+// 	err = os.MkdirAll(folderPath, os.ModePerm)
+// 	if err != nil {
+// 		return "", err
+// 	}
+
+// 	// Mendapatkan ekstensi file
+// 	fileExtension := strings.TrimPrefix(filepath.Ext(file.Filename), ".")
+
+// 	// Membuat nama file baru
+// 	filename := fmt.Sprintf("%d.%s", time.Now().UnixNano(), fileExtension)
+// 	filePath := filepath.Join(folderPath, filename)
+
+// 	dst, err := os.Create(filePath)
+// 	if err != nil {
+// 		return "", err
+// 	}
+// 	defer dst.Close()
+
+// 	_, err = io.Copy(dst, src)
+// 	if err != nil {
+// 		return "", err
+// 	}
+
+// 	return filename, nil
+// }

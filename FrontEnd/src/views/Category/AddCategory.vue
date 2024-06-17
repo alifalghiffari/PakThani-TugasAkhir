@@ -15,8 +15,8 @@
             <input type="text" class="form-control" v-model="categoryName" required>
           </div>
           <div class="form-group">
-            <label>ImageURL</label>
-            <input type="url" class="form-control" v-model="imageURL" required>
+            <label for="imageURL">Image</label>
+            <input type="file" class="form-control-file" id="imageURL" ref="imageURL" @change="handleFileUploadMain">
           </div>
           <button type="button" class="btn btn-primary" @click="addCategory">Submit</button>
         </form>
@@ -34,6 +34,7 @@ export default {
     return {
       categoryName : null,
       imageURL : null,
+      imgMain: '',
       token: localStorage.getItem('token'),
     }
   },
@@ -42,9 +43,19 @@ export default {
     addCategory() {
       const slug = this.generateSlug(this.categoryName);
 
+      if (this.$refs.imageURL.files.length > 0) {
+        const file = this.$refs.imageURL.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          let base64 = reader.result.split(',')[1];
+          this.imgMain = base64;
+        };
+      }
+
       const newCategory = {
         category: this.categoryName,
-        image: this.imageURL,
+        image: this.imgMain,
         slug: slug,
       }
 
@@ -70,6 +81,9 @@ export default {
       // Remove special characters and replace spaces with hyphens
       const slug = name.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/ /g, '-');
       return slug;
+    },
+    handleFileUploadMain(event) {
+      this.imageURL = event.target.files;
     },
   },
   mounted(){

@@ -4,7 +4,7 @@
 
     <div class="alert alert-primary" role="alert">
       Payment will be made by COD
-      <br>Your Total Order : {{ totalcost }}
+      <br>Your Total Order : Rp. {{ totalcost }}
     </div>
 
     <!-- <button

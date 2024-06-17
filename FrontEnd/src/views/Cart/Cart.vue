@@ -33,7 +33,7 @@
             </router-link>
           </h6>
           <p id="item-price" class="mb-0 font-weight-bold">
-            $ {{ cartItem.product[0].price }} per unit
+            Rp. {{ cartItem.product[0].price }} per unit
           </p>
           <p id="item-quantity" class="mb-0">
             Quantity :
@@ -44,7 +44,7 @@
             />
           </p>
           <p id="item-total-price" class="mb-0">
-            Total Price:
+            Total Price: Rp.
             <span class="font-weight-bold">
              {{ cartItem.product[0].price * cartItem.quantity }}</span
             >

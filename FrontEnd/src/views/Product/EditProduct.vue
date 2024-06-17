@@ -12,7 +12,7 @@
         <form @submit.prevent="editProduct" v-if="product">
           <div class="form-group">
             <label>Category</label>
-            <select class="form-control" v-model="product.categoryId" required>
+            <select class="form-control" v-model.number="product.categoryId" required>
               <option v-for="category in categories" :value="category.id">
                 {{ category.category }}
               </option>
@@ -27,8 +27,12 @@
             <input type="text" class="form-control" v-model="product.description" required>
           </div>
           <div class="form-group">
-            <label>ImageURL</label>
-            <input type="url" class="form-control" v-model="product.image" required>
+            <label for="imageURL">Main Image</label>
+            <input type="file" class="form-control-file" id="imageURL" ref="imageURL" @change="handleFileUploadMain">
+          </div>
+          <div class="custom-file mb-3">
+            <input multiple type="file" class="custom-file-input" id="image1" name="image1" ref="image1" @change="handleFileUpload">
+            <label class="custom-file-label" for="image1">Image Optional</label>
           </div>
           <div class="form-group">
             <label>Price</label>
@@ -47,14 +51,19 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
       product: null,
       categories: [],
       token: localStorage.getItem('token'),
+      base64Images: [],
+      imgMain: ''
     }
   },
+  props: ["baseURL", "products"],
   mounted() {
     if (!this.token) {
       this.$router.push({ name: 'Signin' });
@@ -64,7 +73,6 @@ export default {
       this.getCategories();
     }
   },
-  props: ["baseURL", "products"],
   methods: {
     getCategories() {
       axios.get(`${this.baseURL}api/category`, {
@@ -86,29 +94,60 @@ export default {
     editProduct() {
       const slug = this.generateSlug(this.product.name);
 
+      const img = this.$refs.imageURL.files[0];
+      if (img) {
+        const reader = new FileReader();
+        reader.readAsDataURL(img);
+        reader.onload = () => {
+          let base64 = reader.result.split(',')[1];
+          this.imgMain = base64;
+          this.updateProduct(slug, this.imgMain);
+        };
+      } else {
+        this.updateProduct(slug, this.product.image);
+      }
+    },
+    updateProduct(slug, imgMain) {
+      const base64Images = [];
+      if (this.$refs.image1.files.length > 0) {
+        Array.from(this.$refs.image1.files).forEach(file => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => {
+            let base64String = reader.result.split(',')[1];
+            base64Images.push(base64String);
+            if (base64Images.length === this.$refs.image1.files.length) {
+              this.submitProductUpdate(slug, imgMain, base64Images);
+            }
+          };
+        });
+      } else {
+        this.submitProductUpdate(slug, imgMain, base64Images);
+      }
+    },
+    submitProductUpdate(slug, imgMain, base64Images) {
       const editProduct = {
         id: this.product.id,
         category_id: this.product.categoryId,
         name: this.product.name,
         description: this.product.description,
-        image: this.product.image,
+        image: imgMain,
         price: this.product.price,
         quantity: this.product.quantity,
         slug: slug,
+        images: base64Images
       };
 
-      console.log(editProduct);
-
-      axios.put(`${this.baseURL}/api/products/${this.product.id}`, editProduct, {
+      axios.put(`${this.baseURL}api/products/${this.product.id}`, editProduct, {
         headers: {
-          Authorization: `Bearer ${this.token}`,
-        },
+          Authorization: `Bearer ${this.token}`
+        }
       }).then((res) => {
         if (res.data.code === 200) {
           swal({
             text: "Product Edit Successfully!",
             icon: "success",
-            closeOnClickOutside: false,
+            closeOnClickOutside: false
           });
           this.$emit("fetchData");
           this.$router.push({ name: 'AdminProduct' });
@@ -118,10 +157,27 @@ export default {
       });
     },
     generateSlug(name) {
-      // Remove special characters and replace spaces with hyphens
       const slug = name.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/ /g, '-');
       return slug;
     },
+    handleFileUploadMain(event) {
+      this.imgMain = event.target.files;
+    },
+    handleFileUpload(event) {
+      const files = event.target.files;
+      const base64Images = [];
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          let base64String = reader.result.split(',')[1];
+          base64Images.push(base64String);
+          if (base64Images.length === files.length) {
+            this.base64Images = base64Images;
+          }
+        };
+      });
+    }
   }
 }
 </script>

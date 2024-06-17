@@ -3,7 +3,7 @@
     <div class="embed-responsive embed-responsive-16by9">
       <img
         class="card-img-top embed-responsive-item"
-        :src="category.icon"
+        :src="getImagePath(category.icon)"
         alt="Category Image"
       />
     </div>
@@ -28,6 +28,9 @@ export default {
   name: "CategoryBox",
   props: ["category"],
   methods: {
+    getImagePath(image) {
+      return require(`../../assets/Icon/${image}`);
+    },
     listProducts() {
       this.$router.push({
         name: "ListProducts",

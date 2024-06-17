@@ -3,7 +3,24 @@
     <div class="row pt-5">
       <div class="col-md-1"></div>
       <div class="col-md-4 col-12">
-        <img :src="product.image" :alt="product.name" class="img-fluid" />
+        <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img class="d-block w-100" :src="getImagePathMain(product.image)" alt="Product Image">
+            </div>
+            <div class="carousel-item" v-for="img in product.images" :key="img.id">
+              <img class="d-block w-100" :src="getImagePath(img.image)" alt="Product Image">
+            </div>
+          </div>
+          <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>
+        </div>
       </div>
       <div class="col-md-6 col-12 pt-3 pt-md-0">
         <h4>{{ product.name }}</h4>
@@ -44,25 +61,6 @@
             <li>ut doloremque dolore corrupti, architecto iusto beatae.</li>
           </ul>
         </div>
-
-        <!-- <button
-          id="wishlist-button"
-          class="btn mr-3 p-1 py-0"
-          :class="{ product_added_wishlist: isAddedToWishlist }"
-          @click="addToWishList(this.id)"
-        >
-          {{ wishlistString }}
-        </button> -->
-        <!-- <button
-          id="show-cart-button"
-          type="button"
-          class="btn mr-3 p-1 py-0"
-          @click="listCartItems()"
-        >
-          Show Cart
-
-          <ion-icon name="cart-outline" v-pre></ion-icon>
-        </button> -->
       </div>
       <div class="col-md-1"></div>
     </div>
@@ -84,6 +82,20 @@ export default {
   },
   props: ["baseURL", "products", "category"],
   methods: {
+    getImagePath(image) {
+      try {
+        return require(`../../assets/img/${image}`);
+      } catch (e) {
+        return ''; 
+      }
+    },
+    getImagePathMain(image) {
+      try {
+        return require(`../../assets/img-main/${image}`);
+      } catch (e) {
+        return ''; 
+      }
+    },
     incrementQuantity() {
       this.quantity++
     },
@@ -92,23 +104,6 @@ export default {
         this.quantity--
       }
     },
-    // addToWishList(productId) {
-    //   axios
-    //     .post(`${this.baseURL}wishlist/add?token=${this.token}`, {
-    //       id: productId,
-    //     })
-    //     .then(
-    //       (response) => {
-    //         if (response.status == 201) {
-    //           this.isAddedToWishlist = true;
-    //           this.wishlistString = "Added to WishList";
-    //         }
-    //       },
-    //       (error) => {
-    //         console.log(error);
-    //       }
-    //     );
-    // },
     addToCart(productId) {
       productId = parseInt(productId, 10);
       console.log(this.product);
@@ -142,7 +137,6 @@ export default {
                 icon: "success",
                 closeOnClickOutside: false,
               });
-              // refresh nav bar
               this.$emit("fetchData");
             }
           })
@@ -151,19 +145,6 @@ export default {
           });
       }
     },
-
-    // listCartItems() {
-    //   axios.get(`${this.baseURL}cart/?token=${this.token}`).then(
-    //     (response) => {
-    //       if (response.status === 200) {
-    //         this.$router.push("/cart");
-    //       }
-    //     },
-    //     (error) => {
-    //       console.log(error);
-    //     }
-    //   );
-    // },
   },
   mounted() {
     this.id = this.$route.params.id;
@@ -181,14 +162,12 @@ export default {
   font-weight: 400;
 }
 
-/* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-/* Firefox */
 input[type="number"] {
   -moz-appearance: textfield;
 }

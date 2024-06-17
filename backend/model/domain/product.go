@@ -10,4 +10,5 @@ type Product struct {
 	Category    Category
 	Quantity    int
 	Slug        string
+	Images      []Image
 }

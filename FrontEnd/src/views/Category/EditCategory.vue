@@ -15,8 +15,8 @@
             <input type="text" class="form-control" v-model="category.category" required>
           </div>
           <div class="form-group">
-            <label>ImageURL</label>
-            <input type="url" class="form-control" v-model="category.icon" required>
+            <label for="imageURL">Image</label>
+            <input type="file" class="form-control-file" id="imageURL" ref="imageURL" @change="handleFileUploadMain">
           </div>
           <button type="submit" class="btn btn-primary">Submit</button>
         </form>
@@ -27,12 +27,13 @@
 </template>
 
 <script>
-import axios from 'axios';
+//import axios from 'axios';
 
 export default {
   data(){
     return {
       category: null,
+      imgMain: '',
       token: localStorage.getItem('token'),
     }
   },
@@ -50,38 +51,74 @@ export default {
       });
     },
     editCategory() {
-      //delete this.category["products"]
       const slug = this.generateSlug(this.category.category);
 
-      const editCategory = {
-        id: this.category.id,
-        category: this.category.category,
-        image: this.category.icon,
-        slug: slug,
-      }
+      const file = this.$refs.imageURL.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          let base64 = reader.result.split(',')[1];
+          this.imgMain = base64;
 
-      axios.put(`${this.baseURL}api/categories/${this.id}`, editCategory, {
-        headers: {
-          Authorization: `Bearer ${this.token}`,
-        },
-      }).then((res) => {
-        if (res.data.code === 200) {
-          swal({
-            text: "Product Edit Successfully!",
-            icon: "success",
-            closeOnClickOutside: false,
+          const editCategory = {
+            id: this.category.id,
+            category: this.category.category,
+            image: this.imgMain,
+            slug: slug,
+          };
+
+          axios.put(`${this.baseURL}api/categories/${this.id}`, editCategory, {
+            headers: {
+              Authorization: `Bearer ${this.token}`,
+            },
+          }).then((res) => {
+            if (res.data.code === 200) {
+              swal({
+                text: "Category Edited Successfully!",
+                icon: "success",
+                closeOnClickOutside: false,
+              });
+              this.$emit("fetchData");
+              this.$router.push({ name: 'AdminCategory' });
+            }
+          }).catch(err => {
+            console.error(err);
           });
-          this.$emit("fetchData");
-          this.$router.push({ name: 'AdminCategory' });
-        }
-      }).catch(err => {
-        console.error(err);
-      });
+        };
+      } else {
+        const editCategory = {
+          id: this.category.id,
+          category: this.category.category,
+          image: this.imgMain,
+          slug: slug,
+        };
+
+        axios.put(`${this.baseURL}api/categories/${this.id}`, editCategory, {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        }).then((res) => {
+          if (res.data.code === 200) {
+            swal({
+              text: "Category Edited Successfully!",
+              icon: "success",
+              closeOnClickOutside: false,
+            });
+            this.$emit("fetchData");
+            this.$router.push({ name: 'AdminCategory' });
+          }
+        }).catch(err => {
+          console.error(err);
+        });
+      }
     },
     generateSlug(name) {
-      // Remove special characters and replace spaces with hyphens
       const slug = name.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/ /g, '-');
       return slug;
+    },
+    handleFileUploadMain(event) {
+      this.imgMain = event.target.files;
     },
   },
   mounted() {
