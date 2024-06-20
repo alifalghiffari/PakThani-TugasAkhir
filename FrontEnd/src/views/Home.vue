@@ -8,7 +8,7 @@
             <div class="container py-5">
               <header class="text-left text-white py-5">
                 <h3 class="mb-4 rounded">
-                  <a href="#start-shopping" role="button" class="bg-white px-2 py-2 p-3 rounded" id="heading">Start Shopping</a>
+                  <a href="#start-shopping" role="button" class="bg-warning px-2 py-2 p-3" id="heading">Start Shopping</a>
                 </h3>
                 <!-- <p id="content" class="lead mb-0 bg-dark p-1 rounded">Start Shopping with Us</p> -->
               </header>
@@ -20,7 +20,7 @@
             <div class="container py-5">
               <header class="text-left text-white py-5">
                 <h3 class="mb-4 rounded">
-                  <a href="#start-shopping" role="button" class="bg-white px-2 py-2 p-3 rounded" id="heading">Start Shopping</a>
+                  <a href="#start-shopping" role="button" class="bg-warning px-2 py-2 p-3" id="heading">Start Shopping</a>
                 </h3>
                 <!-- <p id="content" class="lead mb-0 bg-dark p-1 rounded">Start Shopping with Us</p> -->
               </header>
@@ -32,7 +32,7 @@
             <div class="container py-5">
               <header class="text-left text-white py-5">
                 <h3 class="mb-4 rounded">
-                  <a href="#start-shopping" role="button" class="bg-white px-2 py-2 p-3 rounded" id="heading">Start Shopping</a>
+                  <a href="#start-shopping" role="button" class="bg-warning px-2 py-2 p-3" id="heading">Start Shopping</a>
                 </h3>
                 <!-- <p id="content" class="lead mb-0 bg-dark p-1 rounded">Start Shopping with Us</p> -->
               </header>
@@ -142,6 +142,7 @@
     font-weight: 400;
     opacity: 0.8;
     font-family: 'Josefin Sans', sans-serif;
+    border-radius: 30px;
   }
 
   #content {
