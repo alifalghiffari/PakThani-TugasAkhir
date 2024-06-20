@@ -7,7 +7,7 @@
     </div>
     <!--        for each order display -->
     <div v-for="order in orderList" :key="order.id" class="row mt-2 pt-3 justify-content-around">
-      <div class="col-2"></div>
+      <!-- <div class="col-2"></div> -->
       <!-- <div class="col-md-3 embed-responsive embed-responsive-16by9"> -->
         <!--                display image in left-->
         <!-- <img v-bind:src="order.imageURL" class="w-100 card-img-top embed-responsive-item"> -->

@@ -1,11 +1,9 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <!--    Logo-->
     <router-link class="navbar-brand" :to="{ name: 'Home' }">
       <img id="logo" src="../assets/logo.png" />
     </router-link>
 
-    <!--    Burger Button-->
     <button
       class="navbar-toggler"
       type="button"
@@ -19,8 +17,7 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <!--      Search Bar-->
-      <form class="form-inline ml-auto mr-auto">
+      <form class="form-inline ml-auto mr-auto" ref="searchForm">
         <div class="input-group">
           <input
             size="95"
@@ -31,6 +28,7 @@
             aria-describedby="basic-addon1"
             v-model="searchQuery"
             @keyup="searchProduct(searchQuery)"
+            @input="updateDropdownWidth"
           />
           <div class="input-group-prepend">
             <span class="input-group-text" id="search-button-navbar">
@@ -49,25 +47,38 @@
             </span>
           </div>
         </div>
-        
-        <div v-if="filteredProducts && filteredProducts.length > 0" class="search-results">
+
+        <div
+          v-if="filteredProducts && filteredProducts.length > 0"
+          class="search-results"
+          :style="{ width: dropdownWidth + 'px' }"
+        >
           <ul class="list-group">
-            <li class="list-group-item " v-for="item in filteredProducts" :key="item.id">
+            <li
+              class="list-group-item"
+              v-for="item in filteredProducts"
+              :key="item.id"
+            >
               <div class="container">
                 <div class="row row-cols-3">
-                  <div class="col">
-                    <img :src="item.image" alt="">
+                  <div class="col-2">
+                    <img :src="getImagePathMain(item.image)" alt="" />
                   </div>
-                  <div class="col-sm-9">
-                    <p>{{ item.name }}</p>
+                  <div class="col-sm-7">
+                    <p class="mb-0">{{ item.name }}</p>
                     <div class="row">
                       <div class="col-8 col-sm-6">
-                        <p>{{ item.price }}</p>
+                        <p>Rp. {{ item.price }}</p>
                       </div>
                     </div>
                   </div>
-                  <div class="col">
-                    <router-link :to="{ name: 'ShowDetails', params: { id: item.id } }">Show Detail</router-link>
+                  <div class="col-sm text-right">
+                    <router-link
+                      class="text-warning"
+                      :to="{ name: 'ShowDetails', params: { id: item.id } }"
+                      @click.native="clearSearch"
+                      >Show Detail</router-link
+                    >
                   </div>
                 </div>
               </div>
@@ -75,9 +86,8 @@
           </ul>
         </div>
       </form>
-      
 
-      <!--      DropDowns-->
+      <!-- DropDowns -->
       <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown">
           <a
@@ -92,15 +102,9 @@
             Browse
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <router-link class="dropdown-item" :to="{ name: 'Home' }"
-              >Home</router-link
-            >
-            <router-link class="dropdown-item" :to="{ name: 'Product' }"
-              >Product</router-link
-            >
-            <router-link class="dropdown-item" :to="{ name: 'Category' }"
-              >Category</router-link
-            >
+            <router-link class="dropdown-item" :to="{ name: 'Home' }">Home</router-link>
+            <router-link class="dropdown-item" :to="{ name: 'Product' }">Product</router-link>
+            <router-link class="dropdown-item" :to="{ name: 'Category' }">Category</router-link>
           </div>
         </li>
 
@@ -117,44 +121,18 @@
             Accounts
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <!-- <router-link
-              class="dropdown-item"
-              v-if="!token"
-              :to="{ name: 'Signin' }"
-              >Wishlist</router-link
-            >
-            <router-link class="dropdown-item" v-else :to="{ name: 'Wishlist' }"
-              >Wishlist</router-link
-            > -->
-            <router-link class="dropdown-item" v-if="token && isAdmin" :to="{ name: 'Admin' }"
-              >Admin</router-link
-            >
-            <router-link
-              class="dropdown-item"
-              v-if="!token"
-              :to="{ name: 'Signin' }"
-              >Log In</router-link
-            >
-            <router-link
-              class="dropdown-item"
-              v-if="!token"
-              :to="{ name: 'Signup' }"
-              >Sign Up</router-link
-            >
-            <a class="dropdown-item" v-if="token" href="#" @click="signout"
-              >Sign Out</a
-            >
+            <router-link class="dropdown-item" v-if="token && isAdmin" :to="{ name: 'Admin' }">Admin</router-link>
+            <router-link class="dropdown-item" v-if="!token" :to="{ name: 'Signin' }">Log In</router-link>
+            <router-link class="dropdown-item" v-if="!token" :to="{ name: 'Signup' }">Sign Up</router-link>
+            <a class="dropdown-item" v-if="token" href="#" @click="signout">Sign Out</a>
           </div>
         </li>
 
         <li class="nav-item">
-          <router-link class="nav-link text-light" v-if="token && !isAdmin" :to="{ name: 'Order' }"
-            >Orders</router-link
-          >
+          <router-link class="nav-link text-light" v-if="token && !isAdmin" :to="{ name: 'Order' }">Orders</router-link>
         </li>
         <li class="nav-item">
           <div id="cart">
-            <!-- <span id="nav-cart-count">{{ cartCount }}</span> -->
             <router-link class="text-light" :to="{ name: 'Cart' }"
               ><i class="fa fa-shopping-cart" style="font-size:36px"></i
             ></router-link>
@@ -169,38 +147,40 @@
 import axios from 'axios';
 
 export default {
-  name: "Navbar",
-  props: ["cartCount"],
+  name: 'Navbar',
+  props: ['cartCount'],
   data() {
     return {
       token: null,
       products: [],
       filteredProducts: [],
       searchQuery: '',
-      isLoading: false
+      isLoading: false,
+      dropdownWidth: 0, // New data property
     };
   },
   methods: {
     signout() {
-      localStorage.removeItem("token");
+      localStorage.removeItem('token');
       this.token = null;
-      this.$emit("resetCartCount");
-      this.$router.push({ name: "Home" });
+      this.$emit('resetCartCount');
+      this.$router.push({ name: 'Home' });
       swal({
-        text: "Logged you out. Visit Again",
-        icon: "success",
+        text: 'Logged you out. Visit Again',
+        icon: 'success',
         closeOnClickOutside: false,
       });
     },
     getProduct() {
       this.isLoading = true;
-      axios.get(`http://localhost:3000/api/products`)
+      axios
+        .get(`http://localhost:3000/api/products`)
         .then((res) => {
           if (res.data.code === 200) {
             this.products = res.data.data;
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
         })
         .finally(() => {
@@ -213,7 +193,7 @@ export default {
         this.filteredProducts = [];
       } else {
         if (this.products && this.products.length > 0) {
-          this.filteredProducts = this.products.filter(product =>
+          this.filteredProducts = this.products.filter((product) =>
             product.name.toLowerCase().includes(query.toLowerCase())
           );
         } else {
@@ -221,16 +201,38 @@ export default {
         }
       }
     },
+    getImagePathMain(image) {
+      try {
+        return require(`../assets/img-main/${image}`);
+      } catch (e) {
+        return ''; 
+      }
+    },
+    updateDropdownWidth() {
+      this.$nextTick(() => {
+        const formWidth = this.$refs.searchForm.clientWidth;
+        this.dropdownWidth = formWidth;
+      });
+    },
+    clearSearch() {
+      this.searchQuery = '';
+      this.filteredProducts = [];
+    },
   },
   computed: {
     isAdmin() {
       const role = localStorage.getItem('user');
       return role === 'admin';
-    }
+    },
   },
   mounted() {
     this.getProduct();
-    this.token = localStorage.getItem("token");
+    this.token = localStorage.getItem('token');
+    this.updateDropdownWidth();
+    window.addEventListener('resize', this.updateDropdownWidth);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.updateDropdownWidth);
   },
 };
 </script>
@@ -252,6 +254,7 @@ export default {
   border-top-right-radius: 2px;
   border-bottom-right-radius: 2px;
 }
+
 #nav-cart-count {
   background-color: red;
   color: white;
@@ -265,24 +268,31 @@ export default {
   font-size: 15px;
   margin-left: 10px;
 }
+
 #cart {
   position: relative;
 }
 
 .search-results {
-  top:50px;
+  top: 50px;
   margin-top: 6px;
   position: absolute;
-  background-color: #000000;
+  background-color: #ffffff; /* Changed to white for better contrast */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   max-height: 300px;
-  max-width:1000vh;
   overflow-y: auto;
   z-index: 2;
+  width: 100%; /* Relative width */
 }
 
 .search-results .list-group-item {
   border: none;
+}
+
+.search-results .list-group-item img {
+  width: 90px;
+  height: 50px; 
+  object-fit: cover; 
 }
 
 .search-results .list-group-item a {

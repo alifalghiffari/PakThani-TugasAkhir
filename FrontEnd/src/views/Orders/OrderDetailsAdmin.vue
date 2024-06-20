@@ -9,7 +9,7 @@
         <div v-for="(orderItem, index) in orderItems" :key="index" class="row mt-2 pt-3 justify-content-around">
             <div class="col-1"></div>
             <div class="col-md-3 embed-responsive embed-responsive-16by9">
-                <img :src="orderItem.product.image" class="w-100 card-img-top embed-responsive-item">
+                <img :src="getImagePathMain(orderItem.product.image)" class="w-100 card-img-top embed-responsive-item">
                 <hr />
             </div>
 
@@ -73,7 +73,14 @@ export default {
             }).catch((err) => {
                 console.error(err);
             });
-        }
+        },
+        getImagePathMain(image) {
+            try {
+                return require(`../../assets/img-main/${image}`);
+            } catch (e) {
+                return ''; 
+            }
+        },
     },
 
     mounted() {

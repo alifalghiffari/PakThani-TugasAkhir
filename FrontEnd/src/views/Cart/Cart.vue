@@ -18,7 +18,8 @@
           :to="{ name: 'ShowDetails', params: { id: cartItem.product[0].id } }"
         >
           <img
-            v-bind:src="cartItem.product[0].image"
+            v-bind:src="getImagePathMain(cartItem.product[0].image)" 
+            alt="Product Image"
             class="w-100 card-img-top embed-responsive-item"
           />
         </router-link>
@@ -219,6 +220,13 @@ export default {
         name: 'ShowDetails',
         params: { id: productId },
       });
+    },
+    getImagePathMain(image) {
+      try {
+        return require(`../../assets/img-main/${image}`);
+      } catch (e) {
+        return ''; 
+      }
     },
   },
   mounted() {

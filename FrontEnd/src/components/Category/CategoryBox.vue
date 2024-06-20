@@ -42,7 +42,16 @@ export default {
 </script>
 
 <style scoped>
-.embed-responsive .card-img-top {
+.embed-responsive {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-img-top {
+  padding-left: 10%; 
+  width: 80%; 
+  height: auto;
   object-fit: cover;
 }
 
