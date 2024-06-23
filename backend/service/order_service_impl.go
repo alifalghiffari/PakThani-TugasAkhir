@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
 	"project-workshop/go-api-ecom/exception"
 	"project-workshop/go-api-ecom/helper"
@@ -102,8 +101,6 @@ func (service *OrderServiceImpl) CreateOrder(ctx context.Context, request web.Or
 		log.Println("Cart is empty")
 		panic(exception.NewNotFoundError("Cart is empty"))
 	}
-
-	fmt.Println(cart)
 
 	totalItems := 0
 	totalPrice := 0
