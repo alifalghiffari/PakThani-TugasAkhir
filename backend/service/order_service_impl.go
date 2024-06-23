@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"project-workshop/go-api-ecom/exception"
 	"project-workshop/go-api-ecom/helper"
@@ -102,11 +103,15 @@ func (service *OrderServiceImpl) CreateOrder(ctx context.Context, request web.Or
 		panic(exception.NewNotFoundError("Cart is empty"))
 	}
 
+	fmt.Println(cart)
+
 	totalItems := 0
 	totalPrice := 0
 	for _, cartItem := range cart {
-		totalItems += cartItem.Quantity
-		totalPrice += cartItem.Quantity * cartItem.Price
+		if len(cartItem.Product) > 0 {
+			totalItems += cartItem.Quantity
+			totalPrice += cartItem.Quantity * cartItem.Product[0].Price
+		}
 	}
 
 	orderStatus := domain.Pending
