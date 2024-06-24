@@ -104,7 +104,7 @@ export default {
           this.updateProduct(slug, this.imgMain);
         };
       } else {
-        this.updateProduct(slug, this.product.image);
+        this.updateProduct(slug, null);
       }
     },
     updateProduct(slug, imgMain) {
@@ -131,13 +131,20 @@ export default {
         category_id: this.product.categoryId,
         name: this.product.name,
         description: this.product.description,
-        image: imgMain,
         price: this.product.price,
         quantity: this.product.quantity,
-        slug: slug,
-        images: base64Images
+        slug: slug
       };
 
+      if (imgMain) {
+        editProduct.image = imgMain;
+      }
+
+      if (base64Images.length > 0 ) {
+        editProduct.images = base64Images;
+      }
+      console.log(editProduct);
+    
       axios.put(`${this.baseURL}api/products/${this.product.id}`, editProduct, {
         headers: {
           Authorization: `Bearer ${this.token}`
