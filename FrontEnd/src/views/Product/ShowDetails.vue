@@ -26,9 +26,6 @@
         <h4>{{ product.name }}</h4>
         <h6 class="category font-italic">{{ category.category }}</h6>
         <h6 class="font-weight-bold">Rp. {{ product.price }}</h6>
-        <p>
-          {{ product.description }}
-        </p>
 
         <div class="d-flex flex-row justify-content-between">
           <div class="quantity-container ">
@@ -51,7 +48,9 @@
           <p>Stock: <b>{{ product.quantity }}</b></p>
         </div>
 
-        <div class="features pt-3">
+        <div v-html="product.description"></div>
+
+        <!-- <div class="features pt-3">
           <h5><strong>Features</strong></h5>
           <ul>
             <li>Lorem ipsum dolor sit amet consectetur adipisicing elit.</li>
@@ -60,7 +59,7 @@
             <li>molestias ipsum ab, ipsa consectetur laboriosam soluta et</li>
             <li>ut doloremque dolore corrupti, architecto iusto beatae.</li>
           </ul>
-        </div>
+        </div> -->
       </div>
       <div class="col-md-1"></div>
     </div>

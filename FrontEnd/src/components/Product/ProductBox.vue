@@ -13,7 +13,7 @@
       >
       <p class="card-text"><sup>Rp</sup>{{ product.price }}</p>
       <p class="card-text font-italic">
-        {{ product.description.substring(0, 65) }}...
+        {{ strippedDescription }}...
       </p>
       <router-link
         id="edit-product"
@@ -31,9 +31,19 @@
 export default {
   name: "ProductBox",
   props: ["product"],
+  computed: {
+    strippedDescription() {
+      return this.stripHtml(this.product.description).substring(0, 65);
+    }
+  },
   methods: {
     getImagePath(image) {
       return require(`../../assets/img-main/${image}`);
+    },
+    stripHtml(html) {
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      return div.textContent || div.innerText || "";
     },
     showDetails() {
       this.$router.push({

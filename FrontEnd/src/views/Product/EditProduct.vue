@@ -1,3 +1,7 @@
+<script setup>
+  import Editor from '@tinymce/tinymce-vue'
+</script>
+
 <template>
   <div class="container">
     <div class="row">
@@ -24,7 +28,15 @@
           </div>
           <div class="form-group">
             <label>Description</label>
-            <input type="text" class="form-control" v-model="product.description" required>
+            <Editor
+              api-key="jzlaylf6k5nu60l768s6m459rg56swoeupz40pf401h1gi6o"
+              v-model="product.description"
+              :init="{
+                toolbar_mode: 'sliding',
+                plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount linkchecker',
+                toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+              }"
+            />
           </div>
           <div class="form-group">
             <label for="imageURL">Main Image</label>
