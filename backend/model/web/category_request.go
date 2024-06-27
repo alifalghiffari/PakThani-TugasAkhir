@@ -9,7 +9,7 @@ type CategoryCreateRequest struct {
 type CategoryUpdateRequest struct {
 	Id       int    `json:"id" validate:"required"`
 	Category string `json:"category" validate:"required,min=1,max=100"`
-	Icon     string `json:"image" validate:"required"`
+	Icon     string `json:"image"`
 	Slug     string `json:"slug" validate:"required"`
 }
 
