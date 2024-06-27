@@ -2,9 +2,9 @@
   <div class="container">
     <div class="row">
       <div class="col-12 text-center">
-        <h4 class="pt-3">Our Categories</h4>
+        <h4 class="pt-3">Kategori</h4>
         <router-link id="add-category" :to="{name : 'AddCategory'}" v-show="$route.name=='AdminCategory'">
-          <button class="btn">Add a new Category</button>
+          <button class="btn">Tambahkan Kategori Baru</button>
         </router-link>
       </div>
     </div>

@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row">
       <div class="col-12 text-center">
-        <h3 class="pt-3">Shopping cart</h3>
+        <h3 class="pt-3">Keranjang</h3>
       </div>
     </div>
     <!--    loop over all the cart items and display one by one-->
@@ -34,10 +34,10 @@
             </router-link>
           </h6>
           <p id="item-price" class="mb-0 font-weight-bold">
-            Rp. {{ cartItem.product[0].price }} per unit
+            Rp {{ cartItem.product[0].price }} / Produk
           </p>
           <p id="item-quantity" class="mb-0">
-            Quantity :
+            Jumlah :
             <input
               size="1"
               class="p-0 h-25 border-bottom border-top-0 border-left-0 border-right-0"
@@ -45,13 +45,13 @@
             />
           </p>
           <p id="item-total-price" class="mb-0">
-            Total Price: Rp.
+            Jumlah Biaya : Rp
             <span class="font-weight-bold">
              {{ cartItem.product[0].price * cartItem.quantity }}</span
             >
           </p>
           <br /><a href="#" class="text-right" @click="deleteItem(cartItem.id, cartItem.product[0].id, cartItem.quantity)"
-            >Remove From Cart</a>
+            >Hapus dari keranjang</a>
         </div>
       </div>
       <div class="col-2"></div>
@@ -60,14 +60,14 @@
 
     <!-- display total price -->
     <div class="total-cost pt-2 text-right">
-      <h5>Total : {{ totalcost }}</h5>
+      <h5>Jumlah : {{ totalcost }}</h5>
       <button
         
         type="button"
         class="btn btn-primary confirm"
         @click="checkout()"
       >
-        Confirm Order
+        Konfirmasi Pesanan
       </button>
     </div>
   </div>
@@ -135,8 +135,8 @@ export default {
     checkout() {
       
       swal({
-        title: "Confirm Order",
-        text: "Are you sure you want to place this order?",
+        title: "Konfirmasi Pesanan",
+        text: "Anda yakin ingin melanjutkan pesanan?",
         icon: "warning",
         buttons: ["Cancel", true],
       }).then((willProceed) => {
@@ -145,13 +145,13 @@ export default {
             this.$router.push({ name: 'Address' });
           } else {
             swal({
-              title: "Confirm Address",
-              text: `This is your address: \n${this.address.nama_penerima} \n${this.address.kabupaten} \n${this.address.kecamatan} \n${this.address.kelurahan} \n${this.address.alamat}\n\nIf you want to change the address, please click Update.`,
+              title: "Konfirmasi Alamat",
+              text: `Alamat Kamu : \n${this.address.nama_penerima} \n${this.address.kabupaten} \n${this.address.kecamatan} \n${this.address.kelurahan} \n${this.address.alamat}\n\n Jika ingin mengubah alamat, klik Ubah Alamat`,
               icon: "warning",
               buttons: {
-                cancel: "Cancel",
+                cancel: "Batalkan",
                 update: {
-                  text: "Update",
+                  text: "Ubah Alamat",
                   value: "update",
                 },
                 ok: true,
@@ -197,7 +197,7 @@ export default {
         .then((response) => {
           if (response.data.code === 200) {
             swal({
-              text: "Product has been removed!",
+              text: "Produk berhasil dihapus dari keranjang!",
               icon: "success",
               closeOnClickOutside: false,
             });

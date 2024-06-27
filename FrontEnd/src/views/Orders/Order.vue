@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row">
       <div class="col-12 text-center">
-        <h4 class="pt-3">Customers Orders</h4>
+        <h4 class="pt-3">Daftar Transaksi</h4>
       </div>
     </div>
     <!--        for each order display -->
@@ -15,10 +15,10 @@
       <div class="col-md-5 px-3">
         <div class="card-block px-3">
           <h6 class="card-title">
-            <router-link v-bind:to="'/order/'+order.id">Order No : {{order.id}}</router-link>
+            <router-link v-bind:to="'/order/'+order.id">Nomor Pesanan : {{order.id}}</router-link>
           </h6>
-          <p class="mb-0">{{order.totalItems}} item<span v-if="order.totalItems > 1">s</span></p>
-          <p id="item-price" class="mb-0 font-weight-bold">Total Cost : Rp. {{order.totalPrice}}</p>
+          <p class="mb-0">{{order.totalItems}} Item<span v-if="order.totalItems > 1"></span></p>
+          <p id="item-price" class="mb-0 font-weight-bold">Jumlah Biaya : Rp {{order.totalPrice}}</p>
           <!-- <p id="item-username">Ordered By : {{order.username}}</p> -->
           <p id="item-status">Status : {{ order.orderStatus }}</p>
         </div>

@@ -36,7 +36,7 @@ export default {
         async onUpload(){
             if(!this.selectedFile) {
                 swal({
-                    text: "Select a file first",
+                    text: "Pilih File terlebih dahulu!",
                     icon: "warning",
                     closeOnClickOutside: false,
                 });
@@ -46,7 +46,7 @@ export default {
                this.selectedFile.type !== "image/jpg") {
                 //file format is not correct
                 swal({
-                    text: "Select a image/jpeg file!",
+                    text: "Pilih file dengan format .jpeg, .jpg, atau .png!",
                     icon: "error",
                     closeOnClickOutside: false,
                 });
@@ -63,7 +63,7 @@ export default {
             .then(res => {
                 this.$router.push({name : "Gallery"});
                 swal({
-                    text: "Image Added Successfully!",
+                    text: "Gambar berhasil ditambahkan!",
                     icon: "success",
                     closeOnClickOutside: false,
                 });

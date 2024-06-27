@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row">
             <div class="col-12 text-center">
-                <h4 class="pt-3">Order Id: {{ orderID }}</h4>
+                <h4 class="pt-3">Nomor Pesanan : {{ orderID }}</h4>
             </div>
         </div>
 
@@ -16,10 +16,10 @@
             <div class="col-md-5 px-3">
                 <div class="card-block px-3">
                     <h6 class="card-title">{{ orderItem.product.name }}</h6>
-                    <p id="item-price" class="mb-0 font-weight-bold">Rp.{{ orderItem.product.price }} per unit</p>
-                    <p id="item-quantity" class="mb-0">Quantity : {{ orderItem.quantity }}</p>
+                    <p id="item-price" class="mb-0 font-weight-bold">Rp {{ orderItem.product.price }} / Produk </p>
+                    <p id="item-quantity" class="mb-0">Jumlah : {{ orderItem.quantity }}</p>
                     <p id="item-total-price" class="mb-0">
-                        Total Price : Rp.<span class="font-weight-bold">{{ orderItem.price }}</span>
+                        Jumlah Biaya : Rp <span class="font-weight-bold">{{ orderItem.price }}</span>
                     </p>
                 </div>
             </div>
@@ -27,7 +27,7 @@
         </div>
 
         <div class="total-cost pt-2 text-right">
-            <h5>Total Cost : Rp. {{ totalPrice }}</h5>
+            <h5>jumlah Biaya : Rp {{ totalPrice }}</h5>
         </div>
     </div>
 

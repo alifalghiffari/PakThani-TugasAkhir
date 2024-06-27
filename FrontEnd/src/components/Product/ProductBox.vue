@@ -20,7 +20,7 @@
         :to="{ name: 'EditProduct', params: { id: product.id } }"
         v-show="$route.name == 'AdminProduct'"
       >
-        Edit
+        Ubah
       </router-link>
     </div>
   </div>

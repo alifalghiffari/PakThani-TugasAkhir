@@ -8,7 +8,8 @@
             <div class="container py-5">
               <header class="text-left text-white py-5">
                 <h3 class="mb-4 rounded">
-                  <a href="#start-shopping" role="button" class="bg-warning px-2 py-2 p-3" id="heading">Start Shopping</a>
+                  <a href="#start-shopping" role="button" class="bg-warning px-2 py-2 p-3" id="heading">Mulai
+                    Belanja</a>
                 </h3>
                 <!-- <p id="content" class="lead mb-0 bg-dark p-1 rounded">Start Shopping with Us</p> -->
               </header>
@@ -20,7 +21,8 @@
             <div class="container py-5">
               <header class="text-left text-white py-5">
                 <h3 class="mb-4 rounded">
-                  <a href="#start-shopping" role="button" class="bg-warning px-2 py-2 p-3" id="heading">Start Shopping</a>
+                  <a href="#start-shopping" role="button" class="bg-warning px-2 py-2 p-3" id="heading">Mulai
+                    Belanja</a>
                 </h3>
                 <!-- <p id="content" class="lead mb-0 bg-dark p-1 rounded">Start Shopping with Us</p> -->
               </header>
@@ -32,7 +34,8 @@
             <div class="container py-5">
               <header class="text-left text-white py-5">
                 <h3 class="mb-4 rounded">
-                  <a href="#start-shopping" role="button" class="bg-warning px-2 py-2 p-3" id="heading">Start Shopping</a>
+                  <a href="#start-shopping" role="button" class="bg-warning px-2 py-2 p-3" id="heading">Mulai
+                    Belanja</a>
                 </h3>
                 <!-- <p id="content" class="lead mb-0 bg-dark p-1 rounded">Start Shopping with Us</p> -->
               </header>
@@ -63,11 +66,12 @@
     <div id="start-shopping" class="container">
       <div class="row">
         <div class="col-12 text-left">
-          <h2 class="pt-3">Top Categories</h2>
+          <h2 class="pt-3">Kategori</h2>
         </div>
       </div>
       <div class="row">
-        <div v-for="index in this.category_size" :key="index" class="col-md-6 col-xl col-12 pt-3  justify-content-around d-flex">
+        <div v-for="index in this.category_size" :key="index"
+          class="col-md-6 col-xl col-12 pt-3  justify-content-around d-flex">
           <CategoryBox :category="category[index-1]">
           </CategoryBox>
         </div>
@@ -78,11 +82,12 @@
     <div class="container">
       <div class="row">
         <div class="col-12 text-left">
-          <h2 class="pt-3">Top Products</h2>
+          <h2 class="pt-3">Produk</h2>
         </div>
       </div>
       <div class="row">
-        <div v-for="index in this.product_size" :key="index" class="col-md-6 col-xl-4 col-12 pt-3  justify-content-around d-flex">
+        <div v-for="index in this.product_size" :key="index"
+          class="col-md-6 col-xl-4 col-12 pt-3  justify-content-around d-flex">
           <ProductBox :product="products[index-1]">
           </ProductBox>
         </div>

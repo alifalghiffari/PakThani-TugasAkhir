@@ -2,7 +2,7 @@
     <div class="">
       <div class="col-12 justify-content-center d-flex flex-row pt-5">
         <div id="div_class" class="flex-item border">
-          <h2 class="pt-4 pl-4">Input Your Address</h2>
+          <h2 class="pt-4 pl-4">Masukkan Alamat</h2>
           <form v-if="hasAddress" @submit.prevent="addAddress" id="addAdress" class="pt-4 pl-4 pr-4">
             <div class="form-group">
               <label>Nama Penerima</label>
@@ -42,7 +42,7 @@
                 type="text" name="alamat" id="alamat" class="form-control" v-model="alamat" required/>
             </div>
             <div class="form-group">
-              <label>Note</label>
+              <label>Catatan</label>
               <textarea name="note" class="form-control" id="note" v-model="note" cols="30" rows="4"></textarea>
             </div>
             <div class="form-group">
@@ -55,12 +55,12 @@
               <div class="col">
                 <p class="text-center">
                   <router-link
-                    class="btn btn-dark text-center mx-auto px-5 py-1 mb-2" :to="{ name: 'Cart' }">Back To Cart</router-link>
+                    class="btn btn-dark text-center mx-auto px-5 py-1 mb-2" :to="{ name: 'Cart' }">Kembali ke Keranjang</router-link>
                 </p>
               </div>
               <div class="col">
                 <p class="text-center">
-                  <button class="btn btn-dark text-center mx-auto px-5 py-1 mb-2" type="submit">Update</button>
+                  <button class="btn btn-dark text-center mx-auto px-5 py-1 mb-2" type="submit">Simpan</button>
                 </p>
               </div>
             </div>
@@ -104,7 +104,7 @@
                 type="text" name="alamat" id="alamat" class="form-control" v-model="alamat" required/>
             </div>
             <div class="form-group">
-              <label>Note</label>
+              <label>Catatan</label>
               <textarea name="note" class="form-control" id="note" v-model="note" cols="30" rows="4"></textarea>
             </div>
             <div class="form-group">
@@ -117,12 +117,12 @@
               <div class="col">
                 <p class="text-center">
                   <router-link
-                    class="btn btn-dark text-center mx-auto px-5 py-1 mb-2" :to="{ name: 'Cart' }">Back To Cart</router-link>
+                    class="btn btn-dark text-center mx-auto px-5 py-1 mb-2" :to="{ name: 'Cart' }">Kembali ke Keranjang</router-link>
                 </p>
               </div>
               <div class="col">
                 <p class="text-center">
-                  <button class="btn btn-dark text-center mx-auto px-5 py-1 mb-2" type="submit">Update</button>
+                  <button class="btn btn-dark text-center mx-auto px-5 py-1 mb-2" type="submit">Simpan</button>
                 </p>
               </div>
             </div>

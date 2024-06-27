@@ -1,10 +1,10 @@
 <template>
   <div class="div_class">
-    <h3>This is your order!</h3>
+    <h3>Pesanan Kamu</h3>
 
     <div class="alert alert-primary" role="alert">
-      Payment will be made by COD
-      <br>Your Total Order : Rp. {{ totalcost }}
+      Pembayaran akan dilakukan secara COD (Cash On Delivery) setelah barang sampai
+      <br>Jumlah biaya : Rp {{ totalcost }}
     </div>
 
     <!-- <button

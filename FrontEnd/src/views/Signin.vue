@@ -12,51 +12,29 @@
     <div class="row">
       <div class="col-12 justify-content-center d-flex flex-row pt-5">
         <div id="signin-div" class="flex-item border">
-          <h2 class="pt-4 pl-4">Sign-In</h2>
+          <h2 class="pt-4 pl-4">Masuk</h2>
           <form @submit="signin" class="pt-4 pl-4 pr-4">
             <div class="form-group">
               <label>Email</label>
-              <input
-                type="email"
-                class="form-control"
-                v-model="email"
-                required
-              />
+              <input type="email" class="form-control" v-model="email" required />
             </div>
             <div class="form-group">
               <label>Password</label>
-              <input
-                type="password"
-                class="form-control"
-                v-model="password"
-                required
-              />
+              <input type="password" class="form-control" v-model="password" required />
             </div>
-            <small class="form-text text-muted"
-              >By continuing, you agree to PakThani Conditions of Use and
-              Privacy Notice.</small
-            >
+            <small class="form-text text-muted">Dengan ini, Anda menyetujui Ketentuan Penggunaan dan Pemberitahuan
+              Privasi PakThani.</small>
             <button type="submit" class="btn btn-primary mt-2 py-0">
-              Continue
-              <div
-                v-if="loading"
-                class="spinner-border spinner-border-sm"
-                role="status"
-              >
+              Lanjutkan
+              <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
                 <span class="sr-only">Loading...</span>
               </div>
             </button>
           </form>
           <hr />
-          <small class="form-text text-muted pt-2 pl-4 text-center"
-            >Yuk daftar PakThani</small
-          >
+          <small class="form-text text-muted pt-2 text-center">Yuk daftar PakThani</small>
           <p class="text-center">
-            <router-link
-              :to="{ name: 'Signup' }"
-              class="btn btn-dark text-center mx-auto px-5 py-1 mb-2"
-              >Create Account</router-link
-            >
+            <router-link :to="{ name: 'Signup' }" class="btn btn-dark text-center mx-auto px-5 py-1 mb-2">Buat Akun</router-link>
           </p>
         </div>
       </div>
@@ -90,7 +68,7 @@ export default {
         .then((res) => {
           if(res.data.code === 500) {
             swal({
-              text: "Email or Password wrong",
+              text: "Email atau Password Salah!",
               icon: "error",
               closeOnClickOutside: false,
             });
@@ -103,7 +81,7 @@ export default {
         }) 
         .catch((err) => {
           swal({
-            text: "Unable to Log you in!",
+            text: "Tidak bisa Masuk! Coba Lagi!",
             icon: "error",
             closeOnClickOutside: false,
           });

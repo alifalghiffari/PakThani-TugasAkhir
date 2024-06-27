@@ -2,49 +2,43 @@
   <footer>
     <div class="container pt-5">
       <div class="row">
-        <div class="col-md-3 col-6">
-          <ul style="list-style-type: none">
-            <li class="text-light font-weight-bold pb-2">Get to Know Us</li>
-            <li><a class="footer-link font-weight-light" href="#">About Us</a></li>
-            <li><a class="footer-link font-weight-light" href="#">Android App</a><br></li>
-            <li><a class="footer-link font-weight-light" href="#">iOS App</a><br></li>
-          </ul>
-        </div>
-
-        <div class="col-md-3 col-6">
-          <ul style="list-style-type: none">
-            <li class="text-light font-weight-bold">Connect With Us</li>
-            <li><a class="footer-link font-weight-light" href="#">Facebook</a></li>
-            <li><a class="footer-link font-weight-light" href="#">Twitter</a><br></li>
-            <li><a class="footer-link font-weight-light" href="#">Instagram</a><br></li>
-          </ul>
-        </div>
-
-        <div class="col-md-3 col-6">
-          <ul style="list-style-type: none">
-            <li class="text-light font-weight-bold">Make Money With Us</li>
-            <li><a class="footer-link font-weight-light" href="#">Sell with Us</a></li>
-            <li><a class="footer-link font-weight-light" href="#">Become an Affiliate</a><br></li>
-            <li><a class="footer-link font-weight-light" href="#">Advertise Your Products</a><br></li>
-          </ul>
-        </div>
-
-        <div class="col-md-3 col-6">
-          <ul style="list-style-type: none">
-            <li class="text-light font-weight-bold">Let Us Help You</li>
-            <li><a class="footer-link font-weight-light" href="#">Return Centre</a></li>
-            <li><a class="footer-link font-weight-light" href="#">100% Purchase Protection</a><br></li>
-            <li><a class="footer-link font-weight-light" href="#">Help</a><br></li>
-            <li><a class="footer-link font-weight-light" href="#">App Download</a><br></li>
-          </ul>
+        <div class="col-12">
+          <div class="horizontal-line"></div>
         </div>
       </div>
-
+      <div class="row align-items-center justify-content-between pt-5 pb-5">
+        <div class="col-md-4 text-center">
+          <img id="logo" src="../assets/logo.png" alt="Pakthani Logo" />
+        </div>
+        <div class="col-md-4 text-center">
+          <div class="contact-info">
+            <p class="mb-2">
+              <ion-icon name="location-outline"></ion-icon>
+              Jl. Kuta Lampanah, Kuta Alam, Banda Aceh
+            </p>
+            <p class="mb-2">
+              <ion-icon name="call-outline"></ion-icon>
+              +62 822-7220-7548
+            </p>
+            <p class="mb-2">
+              <ion-icon name="logo-instagram"></ion-icon>
+              Social Media
+            </p>
+          </div>
+        </div>
+      </div>
       <div class="row">
         <div class="col-12">
-          <div class="text-center py-5">
-            <img id="logo" src="../assets/logo.png" />
-          </div>
+          <div class="horizontal-line"></div>
+        </div>
+      </div>
+      <div class="row justify-content-between align-items-center pt-3">
+        <div class="col-md-6 d-flex">
+          <a class="footer-link" href="#">About Us</a>
+          <a class="footer-link ms-3" href="#">Contact Us</a>
+        </div>
+        <div class="col-md-6 text-end">
+          <p>Copyright © 2023 • PakThani</p>
         </div>
       </div>
     </div>
@@ -53,37 +47,60 @@
 
 <script>
 export default {
-  name : "Footer"
+  name: "Footer"
 }
 </script>
 
 <style>
 footer {
-  margin-top : 100px;
-  background-color:#232F3E;
-  font-size:16px;
-}
-
-li {
-  padding-left: 0;
-  padding-bottom: 10px;
-}
-
-a {
-  text-decoration: none;
-}
-
-.footer-link {
+  margin-top: 100px;
+  background-color: #232F3E;
+  font-size: 16px;
   color: #DDD;
+  padding: 40px 0;
 }
 
 #logo {
   width: 150px;
 }
 
-footer {
-  font-family: 'Roboto', sans-serif;
+.contact-info {
+  color: #DDD;
 }
 
+.contact-info p {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
+.contact-info ion-icon {
+  margin-right: 10px;
+  font-size: 24px;
+}
+
+.horizontal-line {
+  border-top: 1px solid #DDD;
+  margin: 0 0 20px;
+}
+
+.footer-link {
+  color: #DDD;
+  font-size: 18px;
+  text-decoration: none;
+  margin-right: 20px;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+}
+
+.text-center p {
+  margin: 0;
+}
+
+.text-end p {
+  margin: 0;
+}
 </style>

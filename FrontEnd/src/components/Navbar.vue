@@ -23,7 +23,7 @@
             size="95"
             type="text"
             class="form-control"
-            placeholder="Search Items"
+            placeholder="Cari Produk ..."
             aria-label="Username"
             aria-describedby="basic-addon1"
             v-model="searchQuery"
@@ -68,7 +68,7 @@
                     <p class="mb-0">{{ item.name }}</p>
                     <div class="row">
                       <div class="col-8 col-sm-6">
-                        <p>Rp. {{ item.price }}</p>
+                        <p>Rp {{ item.price }}</p>
                       </div>
                     </div>
                   </div>
@@ -77,7 +77,7 @@
                       class="text-warning"
                       :to="{ name: 'ShowDetails', params: { id: item.id } }"
                       @click.native="clearSearch"
-                      >Show Detail</router-link
+                      >Tampilkan Detail</router-link
                     >
                   </div>
                 </div>
@@ -99,12 +99,12 @@
             aria-haspopup="true"
             aria-expanded="false"
           >
-            Browse
+            Jelajahi
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <router-link class="dropdown-item" :to="{ name: 'Home' }">Home</router-link>
-            <router-link class="dropdown-item" :to="{ name: 'Product' }">Product</router-link>
-            <router-link class="dropdown-item" :to="{ name: 'Category' }">Category</router-link>
+            <router-link class="dropdown-item" :to="{ name: 'Product' }">Produk</router-link>
+            <router-link class="dropdown-item" :to="{ name: 'Category' }">Kategori</router-link>
           </div>
         </li>
 
@@ -118,18 +118,18 @@
             aria-haspopup="true"
             aria-expanded="false"
           >
-            Accounts
+            Akun
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <router-link class="dropdown-item" v-if="token && isAdmin" :to="{ name: 'Admin' }">Admin</router-link>
-            <router-link class="dropdown-item" v-if="!token" :to="{ name: 'Signin' }">Log In</router-link>
-            <router-link class="dropdown-item" v-if="!token" :to="{ name: 'Signup' }">Sign Up</router-link>
-            <a class="dropdown-item" v-if="token" href="#" @click="signout">Sign Out</a>
+            <router-link class="dropdown-item" v-if="!token" :to="{ name: 'Signin' }">Masuk</router-link>
+            <router-link class="dropdown-item" v-if="!token" :to="{ name: 'Signup' }">Daftar</router-link>
+            <a class="dropdown-item" v-if="token" href="#" @click="signout">Keluar</a>
           </div>
         </li>
 
         <li class="nav-item">
-          <router-link class="nav-link text-light" v-if="token && !isAdmin" :to="{ name: 'Order' }">Orders</router-link>
+          <router-link class="nav-link text-light" v-if="token && !isAdmin" :to="{ name: 'Order' }">Transaksi</router-link>
         </li>
         <li class="nav-item">
           <div id="cart">
@@ -166,7 +166,7 @@ export default {
       this.$emit('resetCartCount');
       this.$router.push({ name: 'Home' });
       swal({
-        text: 'Logged you out. Visit Again',
+        text: 'Anda Telah Keluar. Silahkan Datang Kembali!',
         icon: 'success',
         closeOnClickOutside: false,
       });

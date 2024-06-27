@@ -6,7 +6,7 @@
   <div class="container">
     <div class="row">
       <div class="col-12 text-center">
-        <h4 class="pt-3">Add new Product</h4>
+        <h4 class="pt-3">Tambah Produk baru</h4>
       </div>
     </div>
 
@@ -15,7 +15,7 @@
       <div class="col-md-6 px-5 px-md-0">
         <form @submit.prevent="addProduct">
           <div class="form-group">
-            <label>Category</label>
+            <label>Kategori</label>
             <select class="form-control" v-model.number="categoryId" required>
               <option v-for="category in categories" :value="category.id">
                 {{ category.category }}
@@ -23,11 +23,11 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Name</label>
+            <label>Nama</label>
             <input type="text" class="form-control" v-model="name" required>
           </div>
           <div class="form-group">
-            <label>Description</label>
+            <label>Deskripsi</label>
             <Editor
               api-key="jzlaylf6k5nu60l768s6m459rg56swoeupz40pf401h1gi6o"
               v-model="description"
@@ -39,22 +39,22 @@
             />
           </div>
           <div class="form-group">
-            <label for="imageURL">Main Image</label>
+            <label for="imageURL">Gambar Utama</label>
             <input type="file" class="form-control-file" id="imageURL" ref="imageURL" @change="handleFileUploadMain">
           </div>
           <div class="custom-file mb-3">
             <input multiple type="file" class="custom-file-input" id="image1" name="image1" ref="image1" @change="handleFileUpload">
-            <label class="custom-file-label" for="image1">Image Optional</label>
+            <label class="custom-file-label" for="image1">Opsi Gambar</label>
           </div>
           <div class="form-group">
-            <label>Price</label>
+            <label>Harga</label>
             <input type="number" class="form-control" v-model.number="price" required>
           </div>
           <div class="form-group">
-            <label>Stock</label>
+            <label>ketersediaan</label>
             <input type="number" class="form-control" v-model.number="stock" required>
           </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
         </form>
       </div>
       <div class="col-3"></div>
@@ -154,7 +154,7 @@ export default {
       }).then((res) => {
         if (res.data.code === 200) {
           swal({
-            text: "Product Added Successfully!",
+            text: "Produk berhasil ditambahkan!",
             icon: "success",
             closeOnClickOutside: false,
           });

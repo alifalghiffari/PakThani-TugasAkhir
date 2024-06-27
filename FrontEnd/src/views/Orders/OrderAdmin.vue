@@ -2,7 +2,7 @@
     <div class="container">
       <div class="row">
         <div class="col-12 text-center">
-          <h4 class="pt-3">Customers Orders</h4>
+          <h4 class="pt-3">Pesanan Masuk</h4>
         </div>
       </div>
       <!--        for each order display -->
@@ -15,29 +15,29 @@
         <div class="col-md-5 px-3">
           <div class="card-block px-3">
             <h6 class="card-title">
-              <router-link v-bind:to="'/admin/order/'+order.id">Order No : {{order.id}}</router-link>
+              <router-link v-bind:to="'/admin/order/'+order.id">Nomor Pesanan : {{order.id}}</router-link>
             </h6>
-            <p class="mb-0">{{order.total_items}} item<span v-if="order.total_items > 1">s</span></p>
-            <p id="item-price" class="mb-0 font-weight-bold">Total Cost : Rp. {{order.total_price}}</p>
+            <p class="mb-0">{{order.total_items}} Item<span v-if="order.total_items > 1"></span></p>
+            <p id="item-price" class="mb-0 font-weight-bold">Jumlah Biaya : Rp {{order.total_price}}</p>
             <!-- <p id="item-username">Ordered By : {{order.username}}</p> -->
             <form  @submit.prevent="submitStatus(order)">
                 <div class="row align-items-end">
                     <div class="col-8">
-                        <label for="status" class="mb-0">Status: {{ order.order_status }}</label>
+                        <label for="status" class="mb-0">Status : {{ order.order_status }}</label>
                         <select name="status" id="status" class="form-control" v-model="order.selectedStatus" required>
                             <option disabled>Pilih Status</option>
-                            <option value="PROCESS">Processing</option>
-                            <option value="DELIVERED">Delivered</option>
+                            <option value="PROCESS">Dalam Pengiriman</option>
+                            <option value="DELIVERED">Selesai</option>
                         </select>
                     </div>
                     <div class=" col">
-                        <button type="submit" class="btn btn-success">Save</button>
+                        <button type="submit" class="btn btn-success">Simpan</button>
                     </div>
                 </div>
             </form>
             <!-- <p id="item-status" class="mb-0 ">Status : {{ order.order_status }}</p> -->
-            <p id="item-status">Note : {{ order.address.note }}</p>
-            <a href="" @click.prevent="showAddressModal(order)">Detail Address</a>
+            <p id="item-status">Catatan : {{ order.address.note }}</p>
+            <a href="" @click.prevent="showAddressModal(order)">Alamat</a>
           </div>
         </div>
         <div class="col-2"></div>
@@ -50,7 +50,7 @@
         <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-            <h5 class="modal-title" id="addressModalLabel">Detail Address</h5>
+            <h5 class="modal-title" id="addressModalLabel">Alamat Lengkap</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
@@ -62,7 +62,7 @@
             <p>Note : {{ selectedAddress.note }}</p>
             </div>
             <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
             </div>
         </div>
         </div>
@@ -119,7 +119,7 @@
             }).then((res) => {
                 if (res.data.code === 200) {
                 swal({
-                    text: "Status Update Successfully!",
+                    text: "Status berhasil diubah!",
                     icon: "success",
                     closeOnClickOutside: false,
                 });

@@ -3,17 +3,17 @@
     <div class="row">
       <div class="col">
         <router-link :to="{ name: 'AdminProduct' }">
-          <button type="button" class="btn btn-primary btn-lg">Admin Products</button>
+          <button type="button" class="btn btn-primary btn-lg">Produk</button>
         </router-link>
       </div>
       <div class="col">
         <router-link :to="{ name: 'AdminCategory' }">
-          <button type="button" class="btn btn-primary btn-lg">Admin Categories</button>
+          <button type="button" class="btn btn-primary btn-lg">Kategori</button>
         </router-link>
       </div>
       <div class="col">
         <router-link :to="{ name: 'OrderAdmin' }">
-          <button type="button" class="btn btn-primary btn-lg">Admin Order</button>
+          <button type="button" class="btn btn-primary btn-lg">Pesanan Masuk</button>
         </router-link>
       </div>
     </div>

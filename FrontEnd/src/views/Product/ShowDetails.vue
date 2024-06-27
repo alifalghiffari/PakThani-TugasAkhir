@@ -25,11 +25,11 @@
       <div class="col-md-6 col-12 pt-3 pt-md-0">
         <h4>{{ product.name }}</h4>
         <h6 class="category font-italic">{{ category.category }}</h6>
-        <h6 class="font-weight-bold">Rp. {{ product.price }}</h6>
+        <h6 class="font-weight-bold">Rp {{ product.price }}</h6>
 
-        <div class="d-flex flex-row justify-content-between">
-          <div class="quantity-container ">
-            <span class="quantity-label">Quantity</span>
+        <div v-if="!isAdmin" class="d-flex flex-row justify-content-between">
+          <div class="quantity-container">
+            <span class="quantity-label">Jumlah</span>
             <div class="quantity-input-container">
               <button class="quantity-btn" @click="decrementQuantity" :disabled="quantity <= 1">-</button>
               <input class="form-control num text-center" type="number" v-model.number="quantity" min="1" />
@@ -37,29 +37,25 @@
             </div>
           </div>
 
-          <div class="input-group col-md-3 col-4 p-0">
+          <div v-if="!isAdmin" class="input-group col-md-3 col-4 p-0">
             <button type="button" id="add-to-cart-button" class="btn" @click="addToCart(this.id)">
-              Add to Cart
+              + Keranjang
               <ion-icon name="cart-outline" v-pre></ion-icon>
             </button>
           </div>
         </div>
-        <div class="pt-2">
-          <p>Stock: <b>{{ product.quantity }}</b></p>
+        <div class="pt-2 pb-2 d-flex justify-content-between align-items-center">
+          <p class="m-0">Ketersediaan : <b>{{ product.quantity }}</b></p>
+          <div v-if="token && isAdmin" class="input-group col-md-3 col-4 p-0">
+            <router-link :to="{ name: 'EditProduct', params: { id: product.id } }" class="btn btn-warning"
+              id="edit-button">
+              Ubah
+              <ion-icon name="create-outline" v-pre></ion-icon>
+            </router-link>
+          </div>
         </div>
 
         <div v-html="product.description"></div>
-
-        <!-- <div class="features pt-3">
-          <h5><strong>Features</strong></h5>
-          <ul>
-            <li>Lorem ipsum dolor sit amet consectetur adipisicing elit.</li>
-            <li>Officia quas, officiis eius magni error magnam voluptatem</li>
-            <li>nesciunt quod! Earum voluptatibus quaerat dolorem doloribus</li>
-            <li>molestias ipsum ab, ipsa consectetur laboriosam soluta et</li>
-            <li>ut doloremque dolore corrupti, architecto iusto beatae.</li>
-          </ul>
-        </div> -->
       </div>
       <div class="col-md-1"></div>
     </div>
@@ -77,6 +73,7 @@ export default {
       isAddedToWishlist: false,
       wishlistString: "Add to wishlist",
       quantity: 1,
+      isAdmin: false, // Tambahkan properti isAdmin
     };
   },
   props: ["baseURL", "products", "category"],
@@ -85,14 +82,14 @@ export default {
       try {
         return require(`../../assets/img/${image}`);
       } catch (e) {
-        return ''; 
+        return '';
       }
     },
     getImagePathMain(image) {
       try {
         return require(`../../assets/img-main/${image}`);
       } catch (e) {
-        return ''; 
+        return '';
       }
     },
     incrementQuantity() {
@@ -109,13 +106,13 @@ export default {
 
       if (!this.token || this.quantity === 0) {
         swal({
-          text: "Please log in first! or check your quantity",
+          text: "Login Terlebih Dahulu atau Jumlah Produk Tidak Boleh 0!",
           icon: "error",
         });
         return;
       } else if (this.quantity > this.product.quantity) {
         swal({
-          text: "Product out of stock",
+          text: "Ketersediaan produk tidak mencukupi!",
           icon: "error",
         });
         return;
@@ -132,7 +129,7 @@ export default {
           .then((response) => {
             if (response.data.code === 200) {
               swal({
-                text: "Product Added to the cart!",
+                text: "Produk berhasil ditambahkan ke keranjang!",
                 icon: "success",
                 closeOnClickOutside: false,
               });
@@ -143,6 +140,16 @@ export default {
             console.log(error);
           });
       }
+    },
+    editProduct(productId) {
+      // Logika untuk mengedit produk
+      console.log(`Edit product ${productId}`);
+    }
+  },
+  computed: {
+    isAdmin() {
+      const role = localStorage.getItem('user');
+      return role === 'admin';
     },
   },
   mounted() {
@@ -173,6 +180,10 @@ input[type="number"] {
 
 #add-to-cart-button {
   background-color: #febd69;
+}
+
+#edit-button {
+  background-color: #ffa726;
 }
 
 #wishlist-button {
@@ -217,5 +228,9 @@ input[type="number"] {
   text-align: center;
   padding: 5px;
   border: 1px solid #ccc;
+}
+
+.d-flex.align-items-center {
+  align-items: center !important;
 }
 </style>
